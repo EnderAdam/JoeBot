@@ -1,0 +1,1 @@
+worker: java -jar target/JoBot-1.0.jar
