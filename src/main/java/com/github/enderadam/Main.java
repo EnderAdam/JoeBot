@@ -101,7 +101,9 @@ public class Main {
                         message.getContent().toLowerCase().contains("monke") || message.getContent().toLowerCase().contains("monkie") ||
                         message.getContent().toLowerCase().contains("m*nkey") || message.getContent().toLowerCase().contains("monk*y") ||
                         message.getContent().toLowerCase().contains("vibe") || message.getContent().toLowerCase().contains("joebot") ||
-                        message.getContent().toLowerCase().contains("nezuko") || message.getContent().toLowerCase().contains("m0nkey")
+                        message.getContent().toLowerCase().contains("nezuko") || message.getContent().toLowerCase().contains("m0nkey") ||
+                        message.getContent().toLowerCase().contains("\u200E")
+
                 ) {
 //                    message.addReaction("🐒"); //monkey
                     kickPerson(api, message);
