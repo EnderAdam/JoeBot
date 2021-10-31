@@ -21,6 +21,7 @@ public class Main {
     private static List<SlashCommand> allCommands = new ArrayList<>();
     private static Map<Timer, String> mutedList = new HashMap<>();
     private static boolean isKicking = true;
+    private static boolean sendImages = false;
 
     private static String[] quotes = {"If you have a problem figuring out whether you’re for me or Trump, then you ain’t black.",
             "I may be Irish but I’m not stupid.",
@@ -93,7 +94,7 @@ public class Main {
 //                    }
 //                }
 
-                giveMeJoBot(message, false);
+                giveMeJoBot(message, sendImages);
 
 
 //                Pattern forbiddenWords = Pattern.compile("monkey|monky|monke|monkie|m*nkey|monk*y|vibe|joebot|nezuko");
@@ -128,9 +129,13 @@ public class Main {
             if (message.getContent().contains("🐒") || message.getContent().contains("🐵")) {
                 kickPerson(api, message, event);
             }
-            if (message.getContent().equals("kicking") && message.getAuthor().asUser().get().getName().equals("EnderAdam")){
+            if (message.getContent().equals("kicking") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
                 isKicking = !isKicking;
-                message.getAuthor().asUser().get().sendMessage("Kicking is "+ isKicking);
+                message.getAuthor().asUser().get().sendMessage("Kicking is " + isKicking);
+            }
+            if (message.getContent().equals("kicking") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
+                sendImages = !sendImages;
+                message.getAuthor().asUser().get().sendMessage("Sending Images is " + sendImages);
             }
 
             message.addReactionAddListener(eventReaction -> {
@@ -230,7 +235,7 @@ public class Main {
 
     private static void kickPerson(DiscordApi api, Message message, MessageCreateEvent event) {
 
-        if (!isKicking){
+        if (!isKicking) {
             return;
         }
 //        message.getAuthor().asUser().get().sendMessage("SPAM");
