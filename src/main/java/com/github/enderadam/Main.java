@@ -94,7 +94,7 @@ public class Main {
 
                 giveMeJoBot(message, false);
 
-                if (message.getContent().contains("monkey") || message.getContent().contains("monky") || message.getContent().contains("monke")) {
+                if (message.getContent().contains("monkey") || message.getContent().contains("monky") || message.getContent().contains("monke") || message.getContent().contains("monkie") || message.getContent().contains("m*nkey") || message.getContent().contains("monk*y")) {
 //                    message.addReaction("🐒"); //monkey
                     kickPerson(api, message);
                 }
@@ -130,7 +130,7 @@ public class Main {
                     }
                 }
                 if (eventReaction.getEmoji().equalsEmoji("🐒")) {
-//                    eventReaction.getUser().get().sendMessage("SPAM");
+                    eventReaction.getUser().get().sendMessage("SPAM");
                     if (!eventReaction.getUserIdAsString().equalsIgnoreCase("246637425961467904")) {
                         message.getServer().get().kickUser(eventReaction.getUser().get(), "Hate Speech");
                     }
