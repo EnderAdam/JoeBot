@@ -77,6 +77,20 @@ public class Main {
 //                    System.out.println(e.toString());
 //                }
 //            }
+
+
+            //Toggles
+            if (message.getContent().equals("!kicking") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
+                isKicking = !isKicking;
+                message.getAuthor().asUser().get().sendMessage("Kicking is " + isKicking);
+            }
+            if (message.getContent().equals("!sendimages") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
+                sendImages = !sendImages;
+                message.getAuthor().asUser().get().sendMessage("Sending Images is " + sendImages);
+            }
+
+
+
             HashMap<String, KnownCustomEmoji> allEmoji = new HashMap<>();
             for (KnownCustomEmoji emoji : api.getCustomEmojis()) {
                 if (allEmoji.containsKey(emoji.getName())) {
@@ -129,14 +143,7 @@ public class Main {
             if (message.getContent().contains("🐒") || message.getContent().contains("🐵")) {
                 kickPerson(api, message, event);
             }
-            if (message.getContent().equals("kicking") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
-                isKicking = !isKicking;
-                message.getAuthor().asUser().get().sendMessage("Kicking is " + isKicking);
-            }
-            if (message.getContent().equals("kicking") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
-                sendImages = !sendImages;
-                message.getAuthor().asUser().get().sendMessage("Sending Images is " + sendImages);
-            }
+
 
             message.addReactionAddListener(eventReaction -> {
                 if (eventReaction.getEmoji().equalsEmoji("🍕")) { //pizza
