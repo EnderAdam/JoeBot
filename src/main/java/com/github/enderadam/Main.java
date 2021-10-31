@@ -106,7 +106,7 @@ public class Main {
 //                    message.addReaction("🐒"); //monkey
                     kickPerson(api, message);
                 }
-                if (message.getContent().toLowerCase().contains("nigga-chan")) {
+                if (message.getContent().toLowerCase().contains("nigga-chan") || message.getContent().toLowerCase().contains("niggachan")) {
                     message.addReaction("🥰");
                 }
                 if (Arrays.asList(message.getContent().toLowerCase().split(" ")).contains("ion")) {
