@@ -35,6 +35,9 @@ public class Main {
         // Insert your bot's token here
         String token = "ODk4NDM4NzY0OTA3NjA2MDY2.YWkOTQ.b3eZUH6JYq56wYaJGlQ9sUSM8mA";
 
+        //google
+        //https://www.google.com/search?q=the&tbm=isch
+
 
         DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
         Server XXXX = api.getServerById("819262892506611732").isPresent() ? api.getServerById("819262892506611732").get() : null;
@@ -92,8 +95,8 @@ public class Main {
                 giveMeJoBot(message, false);
 
                 if (message.getContent().contains("monkey") || message.getContent().contains("monky") || message.getContent().contains("monke")) {
-                    message.addReaction("🐒"); //monkey
-//                    kickPerson(api, message);
+//                    message.addReaction("🐒"); //monkey
+                    kickPerson(api, message);
                 }
                 if (Arrays.asList(message.getContent().toLowerCase().split(" ")).contains("ion")) {
                     message.addReaction("⚛️");
@@ -110,13 +113,13 @@ public class Main {
                 if (Math.random() < 0.1)
                     event.getChannel().sendMessage("https://tenor.com/view/hey-joe-monkey-monkey-joe-monkey-heart-love-joe-gif-23020196");
             }
-            if (message.getContent().contains("🐒")) {
+            if (message.getContent().contains("🐒") || message.getContent().contains("🐵")) {
                 kickPerson(api, message);
             }
 
             message.addReactionAddListener(eventReaction -> {
                 if (eventReaction.getEmoji().equalsEmoji("🍕")) { //pizza
-                    eventReaction.deleteMessage();
+//                    eventReaction.deleteMessage();
                 }
 //                System.out.println(eventReaction.getEmoji().getMentionTag());
 
@@ -127,7 +130,10 @@ public class Main {
                     }
                 }
                 if (eventReaction.getEmoji().equalsEmoji("🐒")) {
-                    eventReaction.getUser().get().sendMessage("SPAM");
+//                    eventReaction.getUser().get().sendMessage("SPAM");
+                    if (!eventReaction.getUserIdAsString().equalsIgnoreCase("246637425961467904")) {
+                        message.getServer().get().kickUser(eventReaction.getUser().get(), "Hate Speech");
+                    }
                 }
             }).removeAfter(30, TimeUnit.MINUTES);
         });
@@ -208,20 +214,20 @@ public class Main {
 
     private static void kickPerson(DiscordApi api, Message message) {
 
-        message.getAuthor().asUser().get().sendMessage("SPAM");
+//        message.getAuthor().asUser().get().sendMessage("SPAM");
         if (message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
             System.out.println(message.getServer().get().canKickUser(api.getYourself(), message.getAuthor().asUser().get()));
         } else {
             System.out.println(message.getServer().get());
             System.out.println(message.getAuthor().asUser().get());
             System.out.println(message.getServer().get().canMuteMembers(message.getAuthor().asUser().get()));
-            message.getServer().get().muteUser(message.getUserAuthor().get(), "Hate Speech");
-            javax.swing.Timer muted = new javax.swing.Timer(1000 * 10, null);
-            muted.addActionListener(e -> {
-                message.getServer().get().unmuteUser(message.getUserAuthor().get());
-                muted.stop();
-            });
-            muted.start();
+            message.getServer().get().kickUser(message.getUserAuthor().get(), "Hate Speech");
+//            javax.swing.Timer muted = new javax.swing.Timer(1000 * 10, null);
+//            muted.addActionListener(e -> {
+//                message.getServer().get().unmuteUser(message.getUserAuthor().get());
+//                muted.stop();
+//            });
+//            muted.start();
         }
     }
 
