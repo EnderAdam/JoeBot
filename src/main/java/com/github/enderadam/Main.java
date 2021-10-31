@@ -5,16 +5,15 @@ import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.server.Server;
+import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.SlashCommandInteraction;
 
 import javax.swing.Timer;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 //import org.json.simple.*;
 
@@ -29,7 +28,7 @@ public class Main {
             "I shouldn’t have been such a wise guy.",
             "Eat some chocolate chocolate chip",
             "I got hairy legs that turn blonde in the Sun. Kids used to come up and reach into the pool and rub my leg down",
-            "I learned about roaches, I learned about kids jumping on my laps. And I love kids jumping on my lap"
+            "I learned about roaches, I learned about kids jumping on my lap. And I love kids jumping on my lap."
     };
 
     public static void main(String[] args) {
@@ -105,7 +104,7 @@ public class Main {
 
                 ) {
 //                    message.addReaction("🐒"); //monkey
-                    kickPerson(api, message);
+                    kickPerson(api, message, event);
                 }
                 if (message.getContent().toLowerCase().contains("nigga-chan") || message.getContent().toLowerCase().contains("niggachan")) {
                     message.addReaction("🥰");
@@ -126,7 +125,7 @@ public class Main {
                     event.getChannel().sendMessage("https://tenor.com/view/hey-joe-monkey-monkey-joe-monkey-heart-love-joe-gif-23020196");
             }
             if (message.getContent().contains("🐒") || message.getContent().contains("🐵")) {
-                kickPerson(api, message);
+                kickPerson(api, message, event);
             }
 
             message.addReactionAddListener(eventReaction -> {
@@ -135,17 +134,17 @@ public class Main {
                 }
 //                System.out.println(eventReaction.getEmoji().getMentionTag());
 
-                if (eventReaction.getEmoji().equalsEmoji(allEmoji.get("isleep")) || eventReaction.getEmoji().equalsEmoji(allEmoji.get("isleep2"))) {
-                    if (eventReaction.getUserIdAsString().equalsIgnoreCase("202206936601460736")) {
+//                if (eventReaction.getEmoji().equalsEmoji(allEmoji.get("isleep")) || eventReaction.getEmoji().equalsEmoji(allEmoji.get("isleep2"))) {
+//                    if (eventReaction.getUserIdAsString().equalsIgnoreCase("202206936601460736")) {
 //                        eventReaction.removeReaction();
-                        eventReaction.addReactionsToMessage(allEmoji.get("nosleep"));
-                    }
-                }
+//                        eventReaction.addReactionsToMessage(allEmoji.get("nosleep"));
+//                    }
+//                }
                 if (eventReaction.getEmoji().equalsEmoji("🐒")) {
                     eventReaction.getUser().get().sendMessage("SPAM");
-                    if (!eventReaction.getUserIdAsString().equalsIgnoreCase("246637425961467904")) {
-                        message.getServer().get().kickUser(eventReaction.getUser().get(), "Hate Speech");
-                    }
+//                    if (!eventReaction.getUserIdAsString().equalsIgnoreCase("246637425961467904")) {
+//                        message.getServer().get().kickUser(eventReaction.getUser().get(), "Hate Speech");
+//                    }
                 }
             }).removeAfter(30, TimeUnit.MINUTES);
         });
@@ -224,7 +223,7 @@ public class Main {
         }
     }
 
-    private static void kickPerson(DiscordApi api, Message message) {
+    private static void kickPerson(DiscordApi api, Message message, MessageCreateEvent event) {
 
 //        message.getAuthor().asUser().get().sendMessage("SPAM");
         if (message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
@@ -234,6 +233,7 @@ public class Main {
             System.out.println(message.getAuthor().asUser().get());
             System.out.println(message.getServer().get().canMuteMembers(message.getAuthor().asUser().get()));
             message.getServer().get().kickUser(message.getUserAuthor().get(), "Hate Speech");
+            event.getChannel().sendMessage(message.getUserAuthor().get().getName() + "is kicked 😤");
 //            javax.swing.Timer muted = new javax.swing.Timer(1000 * 10, null);
 //            muted.addActionListener(e -> {
 //                message.getServer().get().unmuteUser(message.getUserAuthor().get());
