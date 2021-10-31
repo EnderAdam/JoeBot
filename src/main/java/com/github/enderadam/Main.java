@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 public class Main {
     private static List<SlashCommand> allCommands = new ArrayList<>();
     private static Map<Timer, String> mutedList = new HashMap<>();
+    private static boolean isKicking = true;
 
     private static String[] quotes = {"If you have a problem figuring out whether you’re for me or Trump, then you ain’t black.",
             "I may be Irish but I’m not stupid.",
@@ -106,26 +107,30 @@ public class Main {
 //                    message.addReaction("🐒"); //monkey
                     kickPerson(api, message, event);
                 }
-                if (message.getContent().toLowerCase().contains("nigga-chan") || message.getContent().toLowerCase().contains("niggachan")) {
-                    message.addReaction("🥰");
-                }
-                if (Arrays.asList(message.getContent().toLowerCase().split(" ")).contains("ion")) {
-                    message.addReaction("⚛️");
-                }
-                if (Arrays.asList(message.getContent().toLowerCase().split(" ")).contains("forgor")) {
-                    message.addReaction("💀");
-                }
+            }
+            if (message.getContent().toLowerCase().contains("nigga-chan") || message.getContent().toLowerCase().contains("niggachan")) {
+                message.addReaction("🥰");
+            }
+            if (Arrays.asList(message.getContent().toLowerCase().split(" ")).contains("ion")) {
+                message.addReaction("⚛️");
+            }
+            if (Arrays.asList(message.getContent().toLowerCase().split(" ")).contains("forgor")) {
+                message.addReaction("💀");
             }
             if (message.getContent().contains("@2")) {
                 message.delete();
                 event.getChannel().sendMessage((message.getContent().split("@2")[1]));
             }
             if (message.getContent().contains("joe")) {
-                if (Math.random() < 0.1)
+                if (Math.random() < 0.25)
                     event.getChannel().sendMessage("https://tenor.com/view/hey-joe-monkey-monkey-joe-monkey-heart-love-joe-gif-23020196");
             }
             if (message.getContent().contains("🐒") || message.getContent().contains("🐵")) {
                 kickPerson(api, message, event);
+            }
+            if (message.getContent().equals("kicking") && message.getAuthor().asUser().get().getName().equals("EnderAdam")){
+                isKicking = !isKicking;
+                message.getAuthor().asUser().get().sendMessage("Kicking is "+ isKicking);
             }
 
             message.addReactionAddListener(eventReaction -> {
@@ -225,6 +230,9 @@ public class Main {
 
     private static void kickPerson(DiscordApi api, Message message, MessageCreateEvent event) {
 
+        if (!isKicking){
+            return;
+        }
 //        message.getAuthor().asUser().get().sendMessage("SPAM");
         if (message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
             System.out.println(message.getServer().get().canKickUser(api.getYourself(), message.getAuthor().asUser().get()));
@@ -233,7 +241,7 @@ public class Main {
             System.out.println(message.getAuthor().asUser().get());
             System.out.println(message.getServer().get().canMuteMembers(message.getAuthor().asUser().get()));
             message.getServer().get().kickUser(message.getUserAuthor().get(), "Hate Speech");
-            event.getChannel().sendMessage(message.getUserAuthor().get().getName() + "is kicked 😤");
+            event.getChannel().sendMessage(message.getUserAuthor().get().getName() + " is kicked 😤");
 //            javax.swing.Timer muted = new javax.swing.Timer(1000 * 10, null);
 //            muted.addActionListener(e -> {
 //                message.getServer().get().unmuteUser(message.getUserAuthor().get());
