@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 //import org.json.simple.*;
 
@@ -94,13 +95,19 @@ public class Main {
 
                 giveMeJoBot(message, false);
 
-                if (message.getContent().contains("monkey") || message.getContent().contains("monky") ||
-                        message.getContent().contains("monke") || message.getContent().contains("monkie") ||
-                        message.getContent().contains("m*nkey") || message.getContent().contains("monk*y") ||
-                        message.getContent().contains("vibe") || message.getContent().contains("joebot")
+
+//                Pattern forbiddenWords = Pattern.compile("monkey|monky|monke|monkie|m*nkey|monk*y|vibe|joebot|nezuko");
+                if (message.getContent().toLowerCase().contains("monkey") || message.getContent().toLowerCase().contains("monky") ||
+                        message.getContent().toLowerCase().contains("monke") || message.getContent().toLowerCase().contains("monkie") ||
+                        message.getContent().toLowerCase().contains("m*nkey") || message.getContent().toLowerCase().contains("monk*y") ||
+                        message.getContent().toLowerCase().contains("vibe") || message.getContent().toLowerCase().contains("joebot") ||
+                        message.getContent().toLowerCase().contains("nezuko") || message.getContent().toLowerCase().contains("m0nkey")
                 ) {
 //                    message.addReaction("🐒"); //monkey
                     kickPerson(api, message);
+                }
+                if (message.getContent().toLowerCase().contains("nigga-chan")) {
+                    message.addReaction("🥰");
                 }
                 if (Arrays.asList(message.getContent().toLowerCase().split(" ")).contains("ion")) {
                     message.addReaction("⚛️");
@@ -109,9 +116,9 @@ public class Main {
                     message.addReaction("💀");
                 }
             }
-            if (message.getContent().contains("%2")) {
+            if (message.getContent().contains("@2")) {
                 message.delete();
-                event.getChannel().sendMessage((message.getContent().split("%2")[1]));
+                event.getChannel().sendMessage((message.getContent().split("@2")[1]));
             }
             if (message.getContent().contains("joe")) {
                 if (Math.random() < 0.1)
