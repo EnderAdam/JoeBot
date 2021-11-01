@@ -89,6 +89,10 @@ public class Main {
                 sendImages = !sendImages;
                 message.getAuthor().asUser().get().sendMessage("Sending Images is " + sendImages);
             }
+            if (message.getContent().equals("!kickperson") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
+                kickPerson = !kickPerson;
+                message.getAuthor().asUser().get().sendMessage("Kicking Jamie is " + kickPerson);
+            }
 
 
 
