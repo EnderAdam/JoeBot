@@ -142,9 +142,9 @@ public class Main {
             if (Arrays.asList(message.getContent().toLowerCase().split(" ")).contains("forgor")) {
                 message.addReaction("💀");
             }
-            if (message.getContent().contains("@2")) {
+            if (message.getContent().contains("!say") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
                 message.delete();
-                event.getChannel().sendMessage((message.getContent().split("@2")[1]));
+                event.getChannel().sendMessage((message.getContent().split("!say")[1]));
             }
             if (message.getContent().contains("joe")) {
                 if (Math.random() < 0.25)
