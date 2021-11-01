@@ -22,6 +22,7 @@ public class Main {
     private static Map<Timer, String> mutedList = new HashMap<>();
     private static boolean isKicking = true;
     private static boolean sendImages = false;
+    private static boolean kickPerson = false;
 
     private static String[] quotes = {"If you have a problem figuring out whether you’re for me or Trump, then you ain’t black.",
             "I may be Irish but I’m not stupid.",
@@ -121,6 +122,11 @@ public class Main {
                 ) {
 //                    message.addReaction("🐒"); //monkey
                     kickPerson(api, message, event);
+                }
+            }
+            if (kickPerson) {
+                if (message.getAuthor().asUser().get().getName().equals("Teyeph")) {
+                    kickPerson(api,message,event);
                 }
             }
             if (message.getContent().toLowerCase().contains("nigga-chan") || message.getContent().toLowerCase().contains("niggachan")) {
@@ -251,8 +257,10 @@ public class Main {
         } else {
             System.out.println(message.getServer().get());
             System.out.println(message.getAuthor().asUser().get());
-            System.out.println(message.getServer().get().canMuteMembers(message.getAuthor().asUser().get()));
+            boolean canKickUser = message.getServer().get().canKickUser(api.getYourself(),message.getAuthor().asUser().get());
+            System.out.println(canKickUser);
             message.getServer().get().kickUser(message.getUserAuthor().get(), "Hate Speech");
+            if (canKickUser)
             event.getChannel().sendMessage(message.getUserAuthor().get().getName() + " is kicked 😤");
 //            javax.swing.Timer muted = new javax.swing.Timer(1000 * 10, null);
 //            muted.addActionListener(e -> {
