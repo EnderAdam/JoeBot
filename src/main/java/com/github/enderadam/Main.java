@@ -127,7 +127,7 @@ public class Main {
                 message.addReaction("🥰");
             }
             if (Arrays.asList(message.getContent().toLowerCase().split(" ")).contains("ion")) {
-                message.addReaction("⚛️");
+                message.addReaction("⚛");
             }
             if (Arrays.asList(message.getContent().toLowerCase().split(" ")).contains("forgor")) {
                 message.addReaction("💀");
