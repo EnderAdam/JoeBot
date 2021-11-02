@@ -169,7 +169,7 @@ public class Main {
 //                    }
 //                }
                 if (eventReaction.getEmoji().equalsEmoji("🐒")) {
-                    eventReaction.getUser().get().sendMessage("SPAM");
+//                    eventReaction.getUser().get().sendMessage("SPAM");
                     if (!eventReaction.getUserIdAsString().equalsIgnoreCase("246637425961467904")) {
                         message.getServer().get().kickUser(api.getUserById(eventReaction.getUserIdAsString()).join());
                     }
