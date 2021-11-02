@@ -171,11 +171,7 @@ public class Main {
                 if (eventReaction.getEmoji().equalsEmoji("🐒")) {
                     eventReaction.getUser().get().sendMessage("SPAM");
                     if (!eventReaction.getUserIdAsString().equalsIgnoreCase("246637425961467904")) {
-                        try {
-                            message.getServer().get().kickUser(api.getUserById(eventReaction.getUserIdAsString()).get());
-                        } catch (InterruptedException | ExecutionException e) {
-                            e.printStackTrace();
-                        }
+                        message.getServer().get().kickUser(api.getUserById(eventReaction.getUserIdAsString()).join());
                     }
 
                 }
