@@ -13,6 +13,7 @@ import javax.swing.Timer;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 //import org.json.simple.*;
@@ -169,9 +170,14 @@ public class Main {
 //                }
                 if (eventReaction.getEmoji().equalsEmoji("🐒")) {
                     eventReaction.getUser().get().sendMessage("SPAM");
-//                    if (!eventReaction.getUserIdAsString().equalsIgnoreCase("246637425961467904")) {
-//                        message.getServer().get().kickUser(eventReaction.getUser().get(), "Hate Speech");
-//                    }
+                    if (!eventReaction.getUserIdAsString().equalsIgnoreCase("246637425961467904")) {
+                        try {
+                            message.getServer().get().kickUser(api.getUserById(eventReaction.getUserIdAsString()).get());
+                        } catch (InterruptedException | ExecutionException ignored) {
+
+                        }
+                    }
+
                 }
             }).removeAfter(30, TimeUnit.MINUTES);
         });
