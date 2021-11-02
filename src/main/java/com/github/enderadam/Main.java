@@ -173,8 +173,8 @@ public class Main {
                     if (!eventReaction.getUserIdAsString().equalsIgnoreCase("246637425961467904")) {
                         try {
                             message.getServer().get().kickUser(api.getUserById(eventReaction.getUserIdAsString()).get());
-                        } catch (InterruptedException | ExecutionException ignored) {
-
+                        } catch (InterruptedException | ExecutionException e) {
+                            e.printStackTrace();
                         }
                     }
 
