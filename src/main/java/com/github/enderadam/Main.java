@@ -96,7 +96,6 @@ public class Main {
             }
 
 
-
             HashMap<String, KnownCustomEmoji> allEmoji = new HashMap<>();
             for (KnownCustomEmoji emoji : api.getCustomEmojis()) {
                 if (allEmoji.containsKey(emoji.getName())) {
@@ -121,7 +120,7 @@ public class Main {
                 if (message.getContent().toLowerCase().contains("monkey") || message.getContent().toLowerCase().contains("monky") ||
                         message.getContent().toLowerCase().contains("monke") || message.getContent().toLowerCase().contains("monkie") ||
                         message.getContent().toLowerCase().contains("m*nkey") || message.getContent().toLowerCase().contains("monk*y") ||
-                        message.getContent().toLowerCase().contains("vibe") || message.getContent().toLowerCase().contains("joebot") ||
+                        message.getContent().toLowerCase().contains("vibe") ||
                         message.getContent().toLowerCase().contains("nezuko") || message.getContent().toLowerCase().contains("m0nkey")
 
                 ) {
@@ -129,11 +128,11 @@ public class Main {
                     kickPerson(api, message, event);
                 }
             }
-            if (kickPerson) {
-                if (message.getAuthor().asUser().get().getName().equals("Teyeph")) {
-                    kickPerson(api,message,event);
-                }
-            }
+//            if (kickPerson) {
+//                if (message.getAuthor().asUser().get().getName().equals("Teyeph")) {
+//                    kickPerson(api,message,event);
+//                }
+//            }
             if (message.getContent().toLowerCase().contains("nigga-chan") || message.getContent().toLowerCase().contains("niggachan")) {
                 message.addReaction("🥰");
             }
@@ -228,6 +227,13 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        List<String> ganbareImages = new ArrayList<>();
+        try {
+            ganbareImages = FileUtils.getAllImages(new File("D:\\Torrent Files\\Ganbare Douki-Chan"), false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         if (!allImages.isEmpty()) {
             if (message.getContent().toLowerCase().contains("give me mommy milkers") ||
                     message.getContent().toLowerCase().contains("give me <@!" + 898438764907606066L + ">")) {
@@ -250,6 +256,11 @@ public class Main {
                 }
             }
         }
+        if (!ganbareImages.isEmpty()) {
+            if (message.getContent().toLowerCase().contains("give me Ganbare")) {
+                message.getChannel().sendMessage((new File(ganbareImages.get((int) ((Math.random()) * ganbareImages.size())))));
+            }
+        }
     }
 
     private static void kickPerson(DiscordApi api, Message message, MessageCreateEvent event) {
@@ -263,11 +274,11 @@ public class Main {
         } else {
             System.out.println(message.getServer().get());
             System.out.println(message.getAuthor().asUser().get());
-            boolean canKickUser = message.getServer().get().canKickUser(api.getYourself(),message.getAuthor().asUser().get());
+            boolean canKickUser = message.getServer().get().canKickUser(api.getYourself(), message.getAuthor().asUser().get());
             System.out.println(canKickUser);
             message.getServer().get().kickUser(message.getUserAuthor().get(), "Hate Speech");
             if (canKickUser)
-            event.getChannel().sendMessage(message.getUserAuthor().get().getName() + " is kicked 😤");
+                event.getChannel().sendMessage(message.getUserAuthor().get().getName() + " is kicked 😤");
 //            javax.swing.Timer muted = new javax.swing.Timer(1000 * 10, null);
 //            muted.addActionListener(e -> {
 //                message.getServer().get().unmuteUser(message.getUserAuthor().get());
