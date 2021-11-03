@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 public class Main {
     private static List<SlashCommand> allCommands = new ArrayList<>();
     private static Map<Timer, String> mutedList = new HashMap<>();
-    private static boolean isKicking = true;
+    private static boolean isKicking = false;
     private static boolean sendImages = false;
     private static boolean kickPerson = false;
 
@@ -257,7 +257,7 @@ public class Main {
             }
         }
         if (!ganbareImages.isEmpty()) {
-            if (message.getContent().toLowerCase().contains("give me Ganbare")) {
+            if (message.getContent().toLowerCase().contains("give me ganbare")) {
                 message.getChannel().sendMessage((new File(ganbareImages.get((int) ((Math.random()) * ganbareImages.size())))));
             }
         }
