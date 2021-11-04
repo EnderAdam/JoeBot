@@ -146,7 +146,7 @@ public class Main {
                 message.delete();
                 event.getChannel().sendMessage((message.getContent().split("!say")[1]));
             }
-            if (message.getContent().contains("joe")) {
+            if (message.getContent().toLowerCase().contains("joe")) {
                 if (Math.random() < 0.25)
                     event.getChannel().sendMessage("https://tenor.com/view/hey-joe-monkey-monkey-joe-monkey-heart-love-joe-gif-23020196");
             }
