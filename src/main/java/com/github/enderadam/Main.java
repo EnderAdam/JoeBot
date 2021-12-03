@@ -142,6 +142,9 @@ public class Main {
             if (Arrays.asList(message.getContent().toLowerCase().split(" ")).contains("forgor")) {
                 message.addReaction("💀");
             }
+            if (Arrays.asList(message.getContent().toLowerCase().split(" ")).contains("clearly")) {
+                message.addReaction(allEmoji.get("clearly"));
+            }
             if (message.getContent().contains("!say") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
                 message.delete();
                 event.getChannel().sendMessage((message.getContent().split("!say")[1]));
