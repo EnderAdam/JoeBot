@@ -14,7 +14,6 @@ import javax.swing.Timer;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 //import org.json.simple.*;
@@ -99,7 +98,7 @@ public class Main {
                 String[] parts = message.getContent().split(" ");
                 StringBuilder concatNick = new StringBuilder();
                 for (int i=2;i<parts.length;i++){
-                    concatNick.append(parts[i]);
+                    concatNick.append(" ").append(parts[i]);
                 }
                 changeNick(api.getUserById(parts[1]).join(),api,ARA,concatNick.toString());
             }
