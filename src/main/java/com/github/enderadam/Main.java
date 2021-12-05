@@ -86,15 +86,17 @@ public class Main {
                 isKicking = !isKicking;
                 message.getAuthor().asUser().get().sendMessage("Kicking is " + isKicking);
             }
-            if (message.getContent().equals("!sendimages") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
+            if (message.getContent().equals("!sendImages") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
                 sendImages = !sendImages;
                 message.getAuthor().asUser().get().sendMessage("Sending Images is " + sendImages);
             }
-            if (message.getContent().equals("!kickperson") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
+            if (message.getContent().equals("!kickPerson") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
                 kickPerson = !kickPerson;
                 message.getAuthor().asUser().get().sendMessage("Kicking Jamie is " + kickPerson);
             }
-
+            if (message.getContent().contains("!changeNick") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
+                changeNick(api,ARA,message.getContent().substring(11));
+            }
 
             HashMap<String, KnownCustomEmoji> allEmoji = new HashMap<>();
             for (KnownCustomEmoji emoji : api.getCustomEmojis()) {
@@ -319,6 +321,10 @@ public class Main {
             result.append(com.getName()).append("   ").append(com.getDescription()).append("\n");
         }
         return result.toString();
+    }
+
+    private static void changeNick(DiscordApi api, Server server, String newNick){
+       api.getYourself().updateNickname(server,newNick);
     }
 
 }
