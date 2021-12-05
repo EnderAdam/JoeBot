@@ -5,6 +5,7 @@ import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.SlashCommandInteraction;
@@ -95,7 +96,8 @@ public class Main {
                 message.getAuthor().asUser().get().sendMessage("Kicking Jamie is " + kickPerson);
             }
             if (message.getContent().contains("!changeNick") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
-                changeNick(api,ARA,message.getContent().substring(11));
+                String[] parts = message.getContent().split(" ");
+                changeNick(api.getUserById(parts[1]).join(),api,ARA,parts[2]);
             }
 
             HashMap<String, KnownCustomEmoji> allEmoji = new HashMap<>();
@@ -323,8 +325,9 @@ public class Main {
         return result.toString();
     }
 
-    private static void changeNick(DiscordApi api, Server server, String newNick){
-       api.getYourself().updateNickname(server,newNick);
+    private static void changeNick(User user, DiscordApi api, Server server, String newNick){
+//       api.getYourself().updateNickname(server,newNick);
+       user.updateNickname(server,newNick);
     }
 
 }
