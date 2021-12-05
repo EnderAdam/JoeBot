@@ -97,7 +97,11 @@ public class Main {
             }
             if (message.getContent().contains("!changeNick") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
                 String[] parts = message.getContent().split(" ");
-                changeNick(api.getUserById(parts[1]).join(),api,ARA,parts[2]);
+                StringBuilder concatNick = new StringBuilder();
+                for (int i=2;i<parts.length;i++){
+                    concatNick.append(parts[i]);
+                }
+                changeNick(api.getUserById(parts[1]).join(),api,ARA,concatNick.toString());
             }
 
             HashMap<String, KnownCustomEmoji> allEmoji = new HashMap<>();
