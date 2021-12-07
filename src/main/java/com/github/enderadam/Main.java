@@ -97,13 +97,22 @@ public class Main {
             if (message.getContent().contains("!changeNick") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
                 String[] parts = message.getContent().split(" ");
                 StringBuilder concatNick = new StringBuilder();
-                for (int i=2;i<parts.length;i++){
+                Server toChange = null;
+                if (parts[2].equals("ARA")){
+                    toChange = ARA;
+                } else {
+                    toChange=XXXX;
+                }
+                for (int i=3;i<parts.length;i++){
                     concatNick.append(" ").append(parts[i]);
                 }
-                changeNick(api.getUserById(parts[1]).join(),api,ARA,concatNick.toString());
+                changeNick(api.getUserById(parts[1]).join(),api,toChange,concatNick.toString());
+            }
+            if (message.getContent().contains("!changeNick") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
+                message.getAuthor().asUser().get().sendMessage(ARA.getInvites().join().toString()) ;
             }
 
-            HashMap<String, KnownCustomEmoji> allEmoji = new HashMap<>();
+                HashMap<String, KnownCustomEmoji> allEmoji = new HashMap<>();
             for (KnownCustomEmoji emoji : api.getCustomEmojis()) {
                 if (allEmoji.containsKey(emoji.getName())) {
                     allEmoji.put(emoji.getName() + "2", emoji);
