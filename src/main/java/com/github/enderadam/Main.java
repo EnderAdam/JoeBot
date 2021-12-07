@@ -108,7 +108,7 @@ public class Main {
                 }
                 changeNick(api.getUserById(parts[1]).join(),api,toChange,concatNick.toString());
             }
-            if (message.getContent().contains("!changeNick") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
+            if (message.getContent().contains("!getInvite") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
                 message.getAuthor().asUser().get().sendMessage(ARA.getInvites().join().toString()) ;
             }
 
