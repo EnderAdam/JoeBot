@@ -38,13 +38,14 @@ public class Main {
 
     public static void main(String[] args) {
         // Insert your bot's token here
-        String token = "ODk4NDM4NzY0OTA3NjA2MDY2.YWkOTQ.b3eZUH6JYq56wYaJGlQ9sUSM8mA";
+        String token = "ODk4NDM4NzY0OTA3NjA2MDY2.YWkOTQ.fxYAOXu1LqiCO8yqIodhT1zDmLU";
 
         //google
         //https://www.google.com/search?q=the&tbm=isch
 
 
-        DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
+        DiscordApi api = new DiscordApiBuilder().setAllIntents().setToken(token).login().join();
+        System.out.println("api set");
         Server XXXX = api.getServerById("819262892506611732").isPresent() ? api.getServerById("819262892506611732").get() : null;
         Server ARA = api.getServerById("442268458072276992").isPresent() ? api.getServerById("442268458072276992").get() : null;
         //for deleting
@@ -124,17 +125,21 @@ public class Main {
             if (message.getContent().contains("league")) {
                 Collection<User> usersInServer = message.getServer().get().getMembers();
                 List<User> leaguers = new ArrayList<>();
-                for (User u: usersInServer){
-                    Set<Activity> activities = u.getActivities();
-                    for (Activity a: activities){
-                        if (a.getDetails().get().toLowerCase(Locale.ROOT).contains("league")){
-                            leaguers.add(u);
+                for (User u : usersInServer) {
+                        Set<Activity> activities = u.getActivities();
+                        System.out.println(activities.size());
+                        for (Activity a : activities) {
+                            if (!a.equals(Optional.empty())) {
+                                a.getDetails();
+                                if (a.getName().toLowerCase(Locale.ROOT).contains("league")) {
+                                    leaguers.add(u);
+                                }
+                            }
                         }
-                    }
                 }
-                if (!leaguers.isEmpty()){
+                if (!leaguers.isEmpty()) {
                     message.getChannel().sendMessage("These losers are currently playing League:");
-                    for (User u: leaguers){
+                    for (User u : leaguers) {
                         message.getChannel().sendMessage(u.getMentionTag());
                     }
                 }
