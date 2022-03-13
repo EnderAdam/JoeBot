@@ -33,7 +33,14 @@ public class Main {
             "I shouldn’t have been such a wise guy.",
             "Eat some chocolate chocolate chip",
             "I got hairy legs that turn blonde in the Sun. Kids used to come up and reach into the pool and rub my leg down",
-            "I learned about roaches, I learned about kids jumping on my lap. And I love kids jumping on my lap."
+            "I learned about roaches, I learned about kids jumping on my lap. And I love kids jumping on my lap.",
+            "Now we have over 120 million dead from COVID",
+            "I shouldn't have been such a wise guy",
+            "How many times did you see people pulling up to McDonald’s, sitting outside during the pandemic so they could do their homework because they couldn’t get — get it off of their — their line?",
+            "Successful dump, dropped everything at the dump. It all worked out. And btw, I got a second load guys coming in if anybody wants to help me unload",
+            "The next president of the United States; Barack America",
+            "I promise you, the president has a big stick. I promise you."
+            
     };
 
     public static void main(String[] args) {
@@ -127,7 +134,6 @@ public class Main {
                 List<User> leaguers = new ArrayList<>();
                 for (User u : usersInServer) {
                         Set<Activity> activities = u.getActivities();
-                        System.out.println(activities.size());
                         for (Activity a : activities) {
                             if (!a.equals(Optional.empty())) {
                                 a.getDetails();
