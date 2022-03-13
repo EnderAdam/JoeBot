@@ -2,6 +2,7 @@ package com.github.enderadam;
 
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
+import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.server.Server;
@@ -98,26 +99,44 @@ public class Main {
                 String[] parts = message.getContent().split(" ");
                 StringBuilder concatNick = new StringBuilder();
                 Server toChange = null;
-                if (parts[2].equals("ARA")){
+                if (parts[2].equals("ARA")) {
                     toChange = ARA;
                 } else {
-                    toChange=XXXX;
+                    toChange = XXXX;
                 }
-                for (int i=3;i<parts.length;i++){
+                for (int i = 3; i < parts.length; i++) {
                     concatNick.append(" ").append(parts[i]);
                 }
-                changeNick(api.getUserById(parts[1]).join(),api,toChange,concatNick.toString());
+                changeNick(api.getUserById(parts[1]).join(), api, toChange, concatNick.toString());
             }
             if (message.getContent().contains("!getInvite") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
-                message.getAuthor().asUser().get().sendMessage(ARA.getInvites().join().toString()) ;
+                message.getAuthor().asUser().get().sendMessage(ARA.getInvites().join().toString());
             }
 
-                HashMap<String, KnownCustomEmoji> allEmoji = new HashMap<>();
+            HashMap<String, KnownCustomEmoji> allEmoji = new HashMap<>();
             for (KnownCustomEmoji emoji : api.getCustomEmojis()) {
                 if (allEmoji.containsKey(emoji.getName())) {
                     allEmoji.put(emoji.getName() + "2", emoji);
                 } else {
                     allEmoji.put(emoji.getName(), emoji);
+                }
+            }
+            if (message.getContent().contains("league")) {
+                Collection<User> usersInServer = message.getServer().get().getMembers();
+                List<User> leaguers = new ArrayList<>();
+                for (User u: usersInServer){
+                    Set<Activity> activities = u.getActivities();
+                    for (Activity a: activities){
+                        if (a.getDetails().get().toLowerCase(Locale.ROOT).contains("league")){
+                            leaguers.add(u);
+                        }
+                    }
+                }
+                if (!leaguers.isEmpty()){
+                    message.getChannel().sendMessage("These losers are currently playing League:");
+                    for (User u: leaguers){
+                        message.getChannel().sendMessage(u.getMentionTag());
+                    }
                 }
             }
             if (!message.getContent().contains(":")) {
@@ -143,12 +162,16 @@ public class Main {
 //                    message.addReaction("🐒"); //monkey
                     kickPerson(api, message, event);
                 }
+
             }
 //            if (kickPerson) {
 //                if (message.getAuthor().asUser().get().getName().equals("Teyeph")) {
 //                    kickPerson(api,message,event);
 //                }
 //            }
+            if (message.getContent().toLowerCase().contains("k-pop") || message.getContent().toLowerCase().contains("kpop")) {
+                message.addReaction(allEmoji.get("garbage_trash"));
+            }
             if (message.getContent().toLowerCase().contains("nigga-chan") || message.getContent().toLowerCase().contains("niggachan")) {
                 message.addReaction("🥰");
             }
@@ -168,7 +191,7 @@ public class Main {
             if (message.getContent().toLowerCase().contains("joe")) {
                 if (Math.random() < 0.25) {
                     event.getChannel().sendMessage("https://tenor.com/view/hey-joe-monkey-monkey-joe-monkey-heart-love-joe-gif-23020196");
-                message.getChannel().sendMessage("Responded to: "+ message.getAuthor().getName());
+                    message.getChannel().sendMessage("Responded to: " + message.getAuthor().getName());
                 }
             }
             if (message.getContent().contains("🐒") || message.getContent().contains("🐵")) {
@@ -337,9 +360,9 @@ public class Main {
         return result.toString();
     }
 
-    private static void changeNick(User user, DiscordApi api, Server server, String newNick){
+    private static void changeNick(User user, DiscordApi api, Server server, String newNick) {
 //       api.getYourself().updateNickname(server,newNick);
-       user.updateNickname(server,newNick);
+        user.updateNickname(server, newNick);
     }
 
 }
