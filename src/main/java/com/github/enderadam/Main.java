@@ -25,11 +25,11 @@ public class Main {
     private static boolean isKicking = false;
     private static boolean sendImages = false;
     private static boolean kickPerson = false;
+    private static boolean league = false;
 
     private static String[] quotes = {"If you have a problem figuring out whether you’re for me or Trump, then you ain’t black.",
             "I may be Irish but I’m not stupid.",
             "Poor kids are just as bright and just as talented as white kids.",
-            "Now we have over 120 million dead from COVID.",
             "I shouldn’t have been such a wise guy.",
             "Eat some chocolate chocolate chip",
             "I got hairy legs that turn blonde in the Sun. Kids used to come up and reach into the pool and rub my leg down",
@@ -40,7 +40,7 @@ public class Main {
             "Successful dump, dropped everything at the dump. It all worked out. And btw, I got a second load guys coming in if anybody wants to help me unload",
             "The next president of the United States; Barack America",
             "I promise you, the president has a big stick. I promise you."
-            
+
     };
 
     public static void main(String[] args) {
@@ -103,6 +103,10 @@ public class Main {
                 kickPerson = !kickPerson;
                 message.getAuthor().asUser().get().sendMessage("Kicking Jamie is " + kickPerson);
             }
+            if (message.getContent().equals("!league") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
+                league = !league;
+                message.getAuthor().asUser().get().sendMessage("League option is " + league);
+            }
             if (message.getContent().contains("!changeNick") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
                 String[] parts = message.getContent().split(" ");
                 StringBuilder concatNick = new StringBuilder();
@@ -129,10 +133,11 @@ public class Main {
                     allEmoji.put(emoji.getName(), emoji);
                 }
             }
-            if (message.getContent().contains("league")) {
-                Collection<User> usersInServer = message.getServer().get().getMembers();
-                List<User> leaguers = new ArrayList<>();
-                for (User u : usersInServer) {
+            if (league) {
+                if (message.getContent().contains("league")) {
+                    Collection<User> usersInServer = message.getServer().get().getMembers();
+                    List<User> leaguers = new ArrayList<>();
+                    for (User u : usersInServer) {
                         Set<Activity> activities = u.getActivities();
                         for (Activity a : activities) {
                             if (!a.equals(Optional.empty())) {
@@ -142,11 +147,15 @@ public class Main {
                                 }
                             }
                         }
-                }
-                if (!leaguers.isEmpty()) {
-                    message.getChannel().sendMessage("These losers are currently playing League:");
-                    for (User u : leaguers) {
-                        message.getChannel().sendMessage(u.getMentionTag());
+                    }
+                    if (!leaguers.isEmpty()) {
+                        message.getChannel().sendMessage("These losers are currently playing League:");
+                        for (User u : leaguers) {
+                            message.getChannel().sendMessage(u.getMentionTag());
+                        }
+                        if (leaguers.size() >= 3) {
+                            message.getChannel().sendMessage("Combo!! We have " + leaguers.size() + " losers");
+                        }
                     }
                 }
             }
