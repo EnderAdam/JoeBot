@@ -25,7 +25,7 @@ public class Main {
     private static boolean isKicking = false;
     private static boolean sendImages = false;
     private static boolean kickPerson = false;
-    private static boolean league = false;
+    private static boolean league = true;
 
     private static String[] quotes = {"If you have a problem figuring out whether you’re for me or Trump, then you ain’t black.",
             "I may be Irish but I’m not stupid.",
