@@ -134,7 +134,7 @@ public class Main {
                 }
             }
             if (league) {
-                if (message.getContent().contains("league")) {
+                if (message.getContent().toLowerCase(Locale.ROOT).contains("league")) {
                     Collection<User> usersInServer = message.getServer().get().getMembers();
                     List<User> leaguers = new ArrayList<>();
                     for (User u : usersInServer) {
@@ -149,13 +149,15 @@ public class Main {
                         }
                     }
                     if (!leaguers.isEmpty()) {
-                        message.getChannel().sendMessage("These losers are currently playing League:");
+                        StringBuilder leaguersToPrint = new StringBuilder();
+                        leaguersToPrint.append("These losers are currently playing League:\n");
                         for (User u : leaguers) {
-                            message.getChannel().sendMessage(u.getMentionTag());
+                            leaguersToPrint.append(u.getMentionTag()).append("\n");
                         }
                         if (leaguers.size() >= 3) {
-                            message.getChannel().sendMessage("Combo!! We have " + leaguers.size() + " losers");
+                            leaguersToPrint.append("Combo!! We have ").append(leaguers.size()).append(" losers");
                         }
+                        message.getChannel().sendMessage(leaguersToPrint.toString());
                     }
                 }
             }
