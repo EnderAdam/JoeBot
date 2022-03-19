@@ -1,1 +1,1 @@
-worker: java -jar target/JoBot-1.0.jar
+worker: java -jar target/JoeBot-1.0.jar

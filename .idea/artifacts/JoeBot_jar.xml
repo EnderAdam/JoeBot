@@ -1,8 +1,8 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="JoBot:jar">
+  <artifact type="jar" name="JoeBot:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/JoBot_jar</output-path>
     <root id="archive" name="JoBot.jar">
-      <element id="module-output" name="JoBot" />
+      <element id="module-output" name="JoeBot" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/javacord/javacord-core/3.3.2/javacord-core-3.3.2.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.9.0/jackson-annotations-2.9.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.9.3/jackson-databind-2.9.3.jar" path-in-jar="/" />

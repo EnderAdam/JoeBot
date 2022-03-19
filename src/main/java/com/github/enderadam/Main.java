@@ -170,7 +170,7 @@ public class Main {
 //                    }
 //                }
 
-                giveMeJoBot(message, sendImages);
+                giveMeJoeBot(message, sendImages);
 
 
 //                Pattern forbiddenWords = Pattern.compile("monkey|monky|monke|monkie|m*nkey|monk*y|vibe|joebot|nezuko");
@@ -260,7 +260,7 @@ public class Main {
                 .join();
         allCommands.add(quoteCommand);
 
-        SlashCommand actionsCommand = SlashCommand.with("actions", "Shows all possible actions with JoBot")
+        SlashCommand actionsCommand = SlashCommand.with("actions", "Shows all possible actions with JoeBot")
                 .createGlobal(api)
                 .join();
         allCommands.add(actionsCommand);
@@ -284,7 +284,7 @@ public class Main {
         System.out.println("You can invite the bot by using the following url: " + api.createBotInvite());
     }
 
-    private static void giveMeJoBot(Message message, boolean b) {
+    private static void giveMeJoeBot(Message message, boolean b) {
         if (!b) {
             return;
         }
