@@ -133,6 +133,14 @@ public class Main {
                     allEmoji.put(emoji.getName(), emoji);
                 }
             }
+            if (message.getContent().toLowerCase(Locale.ROOT).contains("eclipse")){
+                if (Math.random() < 0.25) {
+                    message.addReaction("\uD83C\uDDF8");
+                    message.addReaction("\uD83C\uDDED");
+                    message.addReaction("\uD83C\uDDEE");
+                    message.addReaction("\uD83C\uDDF9");
+                }
+            }
             if (league) {
                 if (message.getContent().toLowerCase(Locale.ROOT).contains("league") && !message.getAuthor().asUser().get().getIdAsString().equalsIgnoreCase("898438764907606066")) {
                     Collection<User> usersInServer = message.getServer().get().getMembers();
