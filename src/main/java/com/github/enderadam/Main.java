@@ -106,7 +106,7 @@ public class Main {
                 for (Server server : api.getServers()) {
                     sb.append(server.getName()).append("\n");
                     try {
-                        sb.append(server.getInvites().get().toString()).append("\n");
+                        sb.append(server.getInvites().get()).append("\n");
                     } catch (InterruptedException | ExecutionException e) {
                         e.printStackTrace();
                     }
