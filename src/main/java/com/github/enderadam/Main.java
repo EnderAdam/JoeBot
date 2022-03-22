@@ -46,7 +46,7 @@ public class Main {
     };
 
     public static void main(String[] args) {
-        // Insert your bot's token here
+        // Insert your bot's token here (Hidden)
         String token = System.getenv("TOKEN");
 
         //google
