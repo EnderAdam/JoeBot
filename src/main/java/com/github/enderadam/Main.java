@@ -99,8 +99,13 @@ public class Main {
                 }
                 changeNick(api.getUserById(parts[1]).join(), api, toChange, concatNick.toString());
             }
-            if (message.getContent().contains("!getInvite") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
-                message.getAuthor().asUser().get().sendMessage(ARA.getInvites().join().toString());
+            if (message.getContent().contains("!servers") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
+//                message.getAuthor().asUser().get().sendMessage(ARA.getInvites().join().toString());
+                StringBuilder sb = new StringBuilder();
+                for (Server server : api.getServers()) {
+                    sb.append(server.getName()).append("\n");
+                }
+                message.getAuthor().asUser().get().sendMessage(sb.toString());
             }
 
             HashMap<String, KnownCustomEmoji> allEmoji = new HashMap<>();
