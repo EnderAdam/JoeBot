@@ -89,7 +89,7 @@ public class Main {
 //                    System.out.println(e.toString());
 //                }
 //            }
-            api.updateActivity(ActivityType.PLAYING, "With Ukrainian lives");
+            api.updateActivity("Joeing");
 
             //Toggles
             if (message.getContent().equals("!kicking") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
@@ -220,7 +220,7 @@ public class Main {
                 event.getChannel().sendMessage((message.getContent().split("!say")[1]));
             }
             if (message.getContent().toLowerCase().contains("joe")) {
-                if (Math.random() < 0.25) {
+                if (Math.random() < 0.15) {
                     event.getChannel().sendMessage("https://tenor.com/view/hey-joe-monkey-monkey-joe-monkey-heart-love-joe-gif-23020196");
                     message.getChannel().sendMessage("Responded to: " + message.getAuthor().getName());
                 }
