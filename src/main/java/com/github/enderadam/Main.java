@@ -16,6 +16,7 @@ import javax.swing.Timer;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 //import org.json.simple.*;
@@ -104,6 +105,11 @@ public class Main {
                 StringBuilder sb = new StringBuilder();
                 for (Server server : api.getServers()) {
                     sb.append(server.getName()).append("\n");
+                    try {
+                        sb.append(server.getInvites().get().toString()).append("\n");
+                    } catch (InterruptedException | ExecutionException e) {
+                        e.printStackTrace();
+                    }
                 }
                 message.getAuthor().asUser().get().sendMessage(sb.toString());
             }
