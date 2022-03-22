@@ -20,14 +20,14 @@ import java.util.concurrent.TimeUnit;
 //import org.json.simple.*;
 
 public class Main {
-    private static List<SlashCommand> allCommands = new ArrayList<>();
-    private static Map<Timer, String> mutedList = new HashMap<>();
+    private static final List<SlashCommand> allCommands = new ArrayList<>();
+    private static final Map<Timer, String> mutedList = new HashMap<>();
     private static boolean isKicking = false;
     private static boolean sendImages = false;
     private static boolean kickPerson = false;
     private static boolean league = true;
 
-    private static String[] quotes = {"If you have a problem figuring out whether you’re for me or Trump, then you ain’t black.",
+    private static final String[] quotes = {"If you have a problem figuring out whether you’re for me or Trump, then you ain’t black.",
             "I may be Irish but I’m not stupid.",
             "Poor kids are just as bright and just as talented as white kids.",
             "I shouldn’t have been such a wise guy.",
@@ -45,7 +45,7 @@ public class Main {
 
     public static void main(String[] args) {
         // Insert your bot's token here
-        String token = "ODk4NDM4NzY0OTA3NjA2MDY2.YWkOTQ.fxYAOXu1LqiCO8yqIodhT1zDmLU";
+        String token = System.getenv("TOKEN");
 
         //google
         //https://www.google.com/search?q=the&tbm=isch
@@ -254,9 +254,6 @@ public class Main {
         });
 
 
-        /**
-         * Slash Commands to add to Discord
-         */
         SlashCommand pingCommand = SlashCommand.with("ping", "Replies with Pong!")
 //                .createForServer(XXXX)
                 .createGlobal(api)
