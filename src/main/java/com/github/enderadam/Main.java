@@ -63,8 +63,6 @@ public class Main {
 //            i.deleteForServer(XXXX);
 //        }
 
-        api.updateActivity("With Ukrainian Lives");
-
         // Add a listener which answers with "Pong!" if someone writes "!ping"
         api.addMessageCreateListener(event -> {
             Message message = event.getMessage();
@@ -112,6 +110,11 @@ public class Main {
                     }
                 }
                 message.getAuthor().asUser().get().sendMessage(sb.toString());
+            }
+            if (message.getContent().contains("!activity") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
+                api.updateActivity((message.getContent().split("!activity")[1]));
+            } else if (message.getContent().contains("!unsetactivity") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
+                api.unsetActivity();
             }
 
             HashMap<String, KnownCustomEmoji> allEmoji = new HashMap<>();
