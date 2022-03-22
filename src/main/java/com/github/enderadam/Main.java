@@ -62,34 +62,11 @@ public class Main {
 //            i.deleteForServer(XXXX);
 //        }
 
+        api.updateActivity("With Ukrainian Lives");
+
         // Add a listener which answers with "Pong!" if someone writes "!ping"
         api.addMessageCreateListener(event -> {
             Message message = event.getMessage();
-
-//            if (message.getContent().equalsIgnoreCase("!joe")){
-//                System.out.println("test");
-//                try {
-//                    String google = "http://www.google.com/search?q=";
-//                    String search = "Joe Biden";
-//                    String charset = "UTF-8";
-//                    String userAgent = "ExampleBot 1.0 (+http://example.com/bot)"; // Change this to your company's name and bot homepage!
-//
-//                    Elements links = Jsoup.connect(google + URLEncoder.encode(search, charset)).userAgent(userAgent).get().select(".g>.r>a");
-//                    System.out.println(links.size());
-//                    for (Element link : links) {
-//                        String title = link.text();
-//                        String url = link.absUrl("href"); // Google returns URLs in format "http://www.google.com/url?q=<url>&sa=U&ei=<someKey>".
-//                        url = URLDecoder.decode(url.substring(url.indexOf('=') + 1, url.indexOf('&')), "UTF-8");
-//                        System.out.println("test3");
-//
-//                        System.out.println("Title: " + title);
-//                        System.out.println("URL: " + url);
-//                    }
-//                } catch (IOException e){
-//                    System.out.println(e.toString());
-//                }
-//            }
-            api.updateActivity("Joeing");
 
             //Toggles
             if (message.getContent().equals("!kicking") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
@@ -179,7 +156,7 @@ public class Main {
 //                    }
 //                }
 
-                giveMeJoeBot(message, sendImages);
+//                giveMeJoeBot(message, sendImages);
 
 
 //                Pattern forbiddenWords = Pattern.compile("monkey|monky|monke|monkie|m*nkey|monk*y|vibe|joebot|nezuko");
@@ -242,15 +219,15 @@ public class Main {
 //                        eventReaction.addReactionsToMessage(allEmoji.get("nosleep"));
 //                    }
 //                }
-                if (eventReaction.getEmoji().equalsEmoji("🐒")) {
-//                    eventReaction.getUser().get().sendMessage("SPAM");
-                    if (isKicking) {
-                        if (!eventReaction.getUserIdAsString().equalsIgnoreCase("246637425961467904")) {
-                            message.getServer().get().kickUser(api.getUserById(eventReaction.getUserIdAsString()).join());
-                        }
-                    }
-
-                }
+//                if (eventReaction.getEmoji().equalsEmoji("🐒")) {
+////                    eventReaction.getUser().get().sendMessage("SPAM");
+//                    if (isKicking) {
+//                        if (!eventReaction.getUserIdAsString().equalsIgnoreCase("246637425961467904")) {
+//                            message.getServer().get().kickUser(api.getUserById(eventReaction.getUserIdAsString()).join());
+//                        }
+//                    }
+//
+//                }
             }).removeAfter(30, TimeUnit.MINUTES);
         });
 
