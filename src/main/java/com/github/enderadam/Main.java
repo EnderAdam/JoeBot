@@ -3,6 +3,7 @@ package com.github.enderadam;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.Activity;
+import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.server.Server;
@@ -88,7 +89,7 @@ public class Main {
 //                    System.out.println(e.toString());
 //                }
 //            }
-
+            api.updateActivity(ActivityType.PLAYING, "With Ukrainian lives");
 
             //Toggles
             if (message.getContent().equals("!kicking") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
