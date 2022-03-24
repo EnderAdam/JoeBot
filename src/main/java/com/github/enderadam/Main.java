@@ -214,6 +214,9 @@ public class Main {
                 if (Math.random() < 0.15) {
                     event.getChannel().sendMessage("https://tenor.com/view/hey-joe-monkey-monkey-joe-monkey-heart-love-joe-gif-23020196");
                     message.getChannel().sendMessage("Responded to: " + message.getAuthor().getName());
+                } else if (Math.random() < 0.05){
+                    event.getChannel().sendMessage("https://tenor.com/view/axanar-alecpeters-axamonitor-monkey-ape-gif-18121300");
+                    message.getChannel().sendMessage("Responded to: " + message.getAuthor().getName());
                 }
             }
             if (message.getContent().contains("🐒") || message.getContent().contains("🐵")) {
