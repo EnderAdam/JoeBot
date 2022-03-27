@@ -68,23 +68,23 @@ public class Main {
             Message message = event.getMessage();
 
             //Toggles
-            if (message.getContent().equals("!kicking") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
+            if (message.getContent().equals("!kicking") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
                 isKicking = !isKicking;
                 message.getAuthor().asUser().get().sendMessage("Kicking is " + isKicking);
             }
-            if (message.getContent().equals("!sendImages") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
+            if (message.getContent().equals("!sendImages") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
                 sendImages = !sendImages;
                 message.getAuthor().asUser().get().sendMessage("Sending Images is " + sendImages);
             }
-            if (message.getContent().equals("!kickPerson") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
+            if (message.getContent().equals("!kickPerson") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
                 kickPerson = !kickPerson;
                 message.getAuthor().asUser().get().sendMessage("Kicking Jamie is " + kickPerson);
             }
-            if (message.getContent().equals("!league") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
+            if (message.getContent().equals("!league") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
                 league = !league;
                 message.getAuthor().asUser().get().sendMessage("League option is " + league);
             }
-            if (message.getContent().contains("!changeNick") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
+            if (message.getContent().contains("!changeNick") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
                 String[] parts = message.getContent().split(" ");
                 StringBuilder concatNick = new StringBuilder();
                 Server toChange = null;
@@ -98,7 +98,7 @@ public class Main {
                 }
                 changeNick(api.getUserById(parts[1]).join(), api, toChange, concatNick.toString());
             }
-            if (message.getContent().contains("!servers") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
+            if (message.getContent().contains("!servers") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
 //                message.getAuthor().asUser().get().sendMessage(ARA.getInvites().join().toString());
                 StringBuilder sb = new StringBuilder();
                 for (Server server : api.getServers()) {
@@ -111,9 +111,9 @@ public class Main {
                 }
                 message.getAuthor().asUser().get().sendMessage(sb.toString());
             }
-            if (message.getContent().contains("!activity") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
+            if (message.getContent().contains("!activity") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
                 api.updateActivity((message.getContent().split("!activity")[1]));
-            } else if (message.getContent().contains("!unsetactivity") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
+            } else if (message.getContent().contains("!unsetactivity") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
                 api.unsetActivity();
             }
 
@@ -206,7 +206,7 @@ public class Main {
             if (Arrays.asList(message.getContent().toLowerCase().split(" ")).contains("clearly")) {
                 message.addReaction(allEmoji.get("clearly"));
             }
-            if (message.getContent().contains("!say") && message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
+            if (message.getContent().contains("!say") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
                 message.delete();
                 event.getChannel().sendMessage((message.getContent().split("!say")[1]));
             }
@@ -337,7 +337,7 @@ public class Main {
             return;
         }
 //        message.getAuthor().asUser().get().sendMessage("SPAM");
-        if (message.getAuthor().asUser().get().getName().equals("EnderAdam")) {
+        if (message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
             System.out.println(message.getServer().get().canKickUser(api.getYourself(), message.getAuthor().asUser().get()));
         } else {
             System.out.println(message.getServer().get());
