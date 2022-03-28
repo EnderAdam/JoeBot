@@ -7,6 +7,7 @@ import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.server.invite.Invite;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.interaction.SlashCommand;
@@ -104,7 +105,9 @@ public class Main {
                 for (Server server : api.getServers()) {
                     sb.append(server.getName()).append("\n");
                     try {
-                        sb.append(server.getInvites().join()).append("\n");
+                        for (Invite invite : server.getInvites().join()){
+                            sb.append(invite.getUrl()).append("\n");
+                        }
                     } catch (java.util.concurrent.CompletionException ignored){
                     }
                 }
