@@ -103,6 +103,7 @@ public class Main {
             if (message.getContent().contains("!servers") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
 //                message.getAuthor().asUser().get().sendMessage(ARA.getInvites().join().toString());
                 StringBuilder sb = new StringBuilder();
+                servers.clear();
                 for (Server server : api.getServers()) {
                     sb.append(server.getName()).append("\n");
                     servers.add(server);
@@ -118,7 +119,7 @@ public class Main {
             if (message.getContent().contains("!listServer") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
 //                message.getAuthor().asUser().get().sendMessage(ARA.getInvites().join().toString());
                 StringBuilder sb = new StringBuilder();
-                Server serverToLook = servers.get(Integer.parseInt((message.getContent().split("!listServer")[1])));
+                Server serverToLook = servers.get(Integer.parseInt((message.getContent().split("!listServer")[1].substring(1))));
                 for (User u : serverToLook.getMembers()){
                     sb.append(u.getName() + "\n");
                 }
