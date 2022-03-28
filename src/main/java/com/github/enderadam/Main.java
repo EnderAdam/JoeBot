@@ -103,11 +103,7 @@ public class Main {
                 StringBuilder sb = new StringBuilder();
                 for (Server server : api.getServers()) {
                     sb.append(server.getName()).append("\n");
-                    try {
-                        sb.append(server.getInvites().get()).append("\n");
-                    } catch (InterruptedException | ExecutionException e) {
-                        e.printStackTrace();
-                    }
+                    sb.append(server.getInvites().join()).append("\n");
                 }
                 message.getAuthor().asUser().get().sendMessage(sb.toString());
             }
