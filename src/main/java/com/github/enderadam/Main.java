@@ -29,6 +29,7 @@ public class Main {
     private static boolean sendImages = false;
     private static boolean kickPerson = false;
     private static boolean league = true;
+    private static List<Server> servers = new ArrayList<>();
 
     private static final String[] quotes = {"If you have a problem figuring out whether you’re for me or Trump, then you ain’t black.",
             "I may be Irish but I’m not stupid.",
@@ -104,12 +105,22 @@ public class Main {
                 StringBuilder sb = new StringBuilder();
                 for (Server server : api.getServers()) {
                     sb.append(server.getName()).append("\n");
+                    servers.add(server);
                     try {
                         for (Invite invite : server.getInvites().join()){
                             sb.append(invite.getUrl()).append("\n");
                         }
                     } catch (java.util.concurrent.CompletionException ignored){
                     }
+                }
+                message.getAuthor().asUser().get().sendMessage(sb.toString());
+            }
+            if (message.getContent().contains("!listServer") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
+//                message.getAuthor().asUser().get().sendMessage(ARA.getInvites().join().toString());
+                StringBuilder sb = new StringBuilder();
+                Server serverToLook = servers.get(Integer.parseInt((message.getContent().split("!listServer")[1])));
+                for (User u : serverToLook.getMembers()){
+                    sb.append(u.getName() + "\n");
                 }
                 message.getAuthor().asUser().get().sendMessage(sb.toString());
             }
