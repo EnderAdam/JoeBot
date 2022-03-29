@@ -206,7 +206,7 @@ public class Main {
 //                }
 //            }
             if (message.getContent().toLowerCase().contains("k-pop") || message.getContent().toLowerCase().contains("kpop")) {
-                message.addReaction(allEmoji.get("garbage_trash"));
+                message.addReaction(allEmoji.get("NoKPop"));
             }
             if (message.getContent().toLowerCase().contains("nigga-chan") || message.getContent().toLowerCase().contains("niggachan")) {
                 message.addReaction("🥰");
