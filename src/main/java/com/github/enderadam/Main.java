@@ -47,6 +47,12 @@ public class Main {
 
     };
 
+    private static final String[] gnMessages = {"Goodnight Gays",
+            "Goodnight Gays, Sleep Tight",
+            "gn ||dn||"
+
+    };
+
     public static void main(String[] args) {
         // Insert your bot's token here (Hidden)
         String token = System.getenv("TOKEN");
@@ -274,6 +280,11 @@ public class Main {
                 .join();
         allCommands.add(quoteCommand);
 
+        SlashCommand gnCommand = SlashCommand.with("gn", "Gets a Joe quote")
+                .createGlobal(api)
+                .join();
+        allCommands.add(gnCommand);
+
         SlashCommand actionsCommand = SlashCommand.with("actions", "Shows all possible actions with JoeBot")
                 .createGlobal(api)
                 .join();
@@ -289,6 +300,8 @@ public class Main {
                 quote(slashCommandInteraction);
             } else if (slashCommandInteraction.getCommandName().equals("actions")) {
                 actionsList(slashCommandInteraction, api);
+            } else if (slashCommandInteraction.getCommandName().equals("gn")) {
+                gnMethod(slashCommandInteraction);
             }
 
         });
@@ -379,6 +392,12 @@ public class Main {
     private static void quote(SlashCommandInteraction slashCommandInteraction) {
         slashCommandInteraction.createImmediateResponder()
                 .setContent(quotes[(int) (Math.random() * quotes.length)])
+                .respond();
+    }
+
+    private static void gnMethod(SlashCommandInteraction slashCommandInteraction) {
+        slashCommandInteraction.createImmediateResponder()
+                .setContent(gnMessages[(int) (Math.random() * gnMessages.length)])
                 .respond();
     }
 
