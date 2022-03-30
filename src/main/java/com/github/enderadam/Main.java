@@ -47,9 +47,9 @@ public class Main {
 
     };
 
-    private static final String[] gnMessages = {"Goodnight Gays",
-            "Goodnight Gays, Sleep Tight",
-            "gn ||dn||"
+    private static final String[] gnMessages = {"Goodnight girl, I see you tomorrow",
+            "Goodnight Gays, Sleep Tight ||like my bussy||",
+            "gn ||dn||",
 
     };
 
