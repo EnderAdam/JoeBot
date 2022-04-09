@@ -4,6 +4,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.activity.ActivityType;
+import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.server.Server;
@@ -225,7 +226,29 @@ public class Main {
             }
             if (message.getContent().contains("!say") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
                 message.delete();
-                event.getChannel().sendMessage((message.getContent().split("!say")[1]));
+                String messageRead = message.getContent();
+                messageRead = messageRead.substring(messageRead.indexOf("!say")+5);
+                StringBuilder toSend = new StringBuilder();
+                List<String> emojis = new ArrayList<>();
+                while (messageRead.length()>0){
+                    if (messageRead.charAt(0)==':'){
+                        messageRead = messageRead.substring(1);
+                        StringBuilder emojiToSend = new StringBuilder();
+                        while (messageRead.charAt(0)!=':'){
+                            System.out.println(messageRead.charAt(0));
+                            emojiToSend.append(messageRead.charAt(0));
+                            messageRead = messageRead.substring(1);
+                        }
+                        messageRead = messageRead.substring(1);
+                        System.out.println(emojiToSend.toString());
+                        emojis.add(allEmoji.get(emojiToSend.toString()).getMentionTag());
+                        toSend.append(allEmoji.get(emojiToSend.toString()).getMentionTag());
+                    } else {
+                        toSend.append(messageRead.charAt(0));
+                        messageRead = messageRead.substring(1);
+                    }
+                }
+                event.getChannel().sendMessage(toSend.toString());
             }
             if (message.getContent().toLowerCase().contains("joe")) {
                 if (Math.random() < 0.15) {
