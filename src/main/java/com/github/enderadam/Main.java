@@ -36,8 +36,8 @@ public class Main {
             "Poor kids are just as bright and just as talented as white kids.",
             "I shouldn’t have been such a wise guy.",
             "Eat some chocolate chocolate chip",
-            "I got hairy legs that turn blonde in the Sun. Kids used to come up and reach into the pool and rub my leg down",
-            "I learned about roaches, I learned about kids jumping on my lap. And I love kids jumping on my lap.",
+            "I got hairy legs that turn blonde in the Sun. Kids used to come up and reach into the pool and rub my leg down. " +
+                    "\nI learned about roaches, I learned about kids jumping on my lap. And I love kids jumping on my lap.",
             "Now we have over 120 million dead from COVID",
             "I shouldn't have been such a wise guy",
             "How many times did you see people pulling up to McDonald’s, sitting outside during the pandemic so they could do their homework because they couldn’t get — get it off of their — their line?",
@@ -56,10 +56,6 @@ public class Main {
     public static void main(String[] args) {
         // Insert your bot's token here (Hidden)
         String token = System.getenv("TOKEN");
-
-        //google
-        //https://www.google.com/search?q=the&tbm=isch
-
 
         DiscordApi api = new DiscordApiBuilder().setAllIntents().setToken(token).login().join();
         System.out.println("api set");
@@ -177,7 +173,8 @@ public class Main {
                         if (leaguers.size() >= 3) {
                             leaguersToPrint.append("Combo!! We have ").append(leaguers.size()).append(" losers");
                         }
-                        message.getChannel().sendMessage(leaguersToPrint.toString());
+                        Message temp = message.getChannel().sendMessage(leaguersToPrint.toString()).join();
+                        temp.addReaction(allEmoji.get("noleague"));
                     }
                 }
             }
