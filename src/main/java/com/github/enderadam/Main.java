@@ -296,7 +296,7 @@ public class Main {
                 .createGlobal(api)
                 .join();
         allCommands.add(quoteCommand);
-        SlashCommand allQuotesCommand = SlashCommand.with("allQuotes", "Gets all Joe quotes")
+        SlashCommand allQuotesCommand = SlashCommand.with("allquotes", "Gets all Joe quotes")
                 .createGlobal(api)
                 .join();
         allCommands.add(allQuotesCommand);
@@ -327,7 +327,7 @@ public class Main {
                 gnMethod(slashCommandInteraction);
             } else if (slashCommandInteraction.getCommandName().equals("emotes")) {
                 emotesCommand(slashCommandInteraction);
-            } else if (slashCommandInteraction.getCommandName().equals("allQuotes")) {
+            } else if (slashCommandInteraction.getCommandName().equals("allquotes")) {
                 allQuotesCommand(slashCommandInteraction);
             }
 
@@ -421,9 +421,10 @@ public class Main {
                 .setContent(quotes[(int) (Math.random() * quotes.length)])
                 .respond();
     }
+
     private static void allQuotesCommand(SlashCommandInteraction slashCommandInteraction) {
         StringBuilder temp = new StringBuilder();
-        for (String s: quotes){
+        for (String s : quotes) {
             temp.append(s).append("\n");
         }
         slashCommandInteraction.createImmediateResponder()
@@ -443,7 +444,6 @@ public class Main {
         for (Emoji e : slashCommandInteraction.getServer().get().getCustomEmojis()) {
             result.append(e.getMentionTag()).append(" ");
         }
-        System.out.println(result.toString());
         slashCommandInteraction.createImmediateResponder()
                 .setContent(result.toString())
                 .respond();
