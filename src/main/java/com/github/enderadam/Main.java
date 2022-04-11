@@ -3,7 +3,6 @@ package com.github.enderadam;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.Activity;
-import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.message.Message;
@@ -18,7 +17,6 @@ import javax.swing.Timer;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 //import org.json.simple.*;
@@ -31,6 +29,7 @@ public class Main {
     private static boolean kickPerson = false;
     private static boolean league = true;
     private static List<Server> servers = new ArrayList<>();
+    private static HashMap<String, KnownCustomEmoji> allEmoji = new HashMap<>();
 
     private static final String[] quotes = {"If you have a problem figuring out whether you’re for me or Trump, then you ain’t black.",
             "I may be Irish but I’m not stupid.",
@@ -112,10 +111,10 @@ public class Main {
                     sb.append(server.getName()).append("\n");
                     servers.add(server);
                     try {
-                        for (Invite invite : server.getInvites().join()){
+                        for (Invite invite : server.getInvites().join()) {
                             sb.append(invite.getUrl()).append("\n");
                         }
-                    } catch (java.util.concurrent.CompletionException ignored){
+                    } catch (java.util.concurrent.CompletionException ignored) {
                     }
                 }
                 message.getAuthor().asUser().get().sendMessage(sb.toString());
@@ -124,7 +123,7 @@ public class Main {
 //                message.getAuthor().asUser().get().sendMessage(ARA.getInvites().join().toString());
                 StringBuilder sb = new StringBuilder();
                 Server serverToLook = servers.get(Integer.parseInt((message.getContent().split("!listServer")[1].substring(1))));
-                for (User u : serverToLook.getMembers()){
+                for (User u : serverToLook.getMembers()) {
                     sb.append(u.getName() + "\n");
                 }
                 message.getAuthor().asUser().get().sendMessage(sb.toString());
@@ -135,7 +134,6 @@ public class Main {
                 api.unsetActivity();
             }
 
-            HashMap<String, KnownCustomEmoji> allEmoji = new HashMap<>();
             for (KnownCustomEmoji emoji : api.getCustomEmojis()) {
                 if (allEmoji.containsKey(emoji.getName())) {
                     allEmoji.put(emoji.getName() + "2", emoji);
@@ -143,7 +141,7 @@ public class Main {
                     allEmoji.put(emoji.getName(), emoji);
                 }
             }
-            if (message.getContent().toLowerCase(Locale.ROOT).contains("eclipse")){
+            if (message.getContent().toLowerCase(Locale.ROOT).contains("eclipse")) {
                 if (Math.random() < 0.25) {
                     message.addReaction("\uD83C\uDDF8");
                     message.addReaction("\uD83C\uDDED");
@@ -228,10 +226,10 @@ public class Main {
             if (message.getContent().contains("!say") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
                 message.delete();
                 String messageRead = message.getContent();
-                messageRead = messageRead.substring(messageRead.indexOf("!say")+5);
+                messageRead = messageRead.substring(messageRead.indexOf("!say") + 5);
                 StringBuilder toSend = new StringBuilder();
                 List<String> emojis = new ArrayList<>();
-                while (messageRead.length()>0){
+                while (messageRead.length() > 0) {
 //                    if (messageRead.charAt(0)==':'){
 //                        messageRead = messageRead.substring(1);
 //                        StringBuilder emojiToSend = new StringBuilder();
@@ -242,8 +240,8 @@ public class Main {
 //                        messageRead = messageRead.substring(1);
 //                        toSend.append(allEmoji.get(emojiToSend.toString()).getMentionTag());
 //                    } else {
-                        toSend.append(messageRead.charAt(0));
-                        messageRead = messageRead.substring(1);
+                    toSend.append(messageRead.charAt(0));
+                    messageRead = messageRead.substring(1);
 //                    }
                 }
                 event.getChannel().sendMessage(toSend.toString());
@@ -252,7 +250,7 @@ public class Main {
                 if (Math.random() < 0.15) {
                     event.getChannel().sendMessage("https://tenor.com/view/hey-joe-monkey-monkey-joe-monkey-heart-love-joe-gif-23020196");
                     message.getChannel().sendMessage("Responded to: " + message.getAuthor().getName());
-                } else if (Math.random() < 0.05){
+                } else if (Math.random() < 0.05) {
                     event.getChannel().sendMessage("https://tenor.com/view/axanar-alecpeters-axamonitor-monkey-ape-gif-18121300");
                     message.getChannel().sendMessage("Responded to: " + message.getAuthor().getName());
                 }
@@ -307,7 +305,10 @@ public class Main {
                 .createGlobal(api)
                 .join();
         allCommands.add(actionsCommand);
-
+        SlashCommand emotesCommand = SlashCommand.with("emotes", "Shows all emotes of the server")
+                .createGlobal(api)
+                .join();
+        allCommands.add(emotesCommand);
 
         api.addSlashCommandCreateListener(event -> {
             SlashCommandInteraction slashCommandInteraction = event.getSlashCommandInteraction();
@@ -320,6 +321,8 @@ public class Main {
                 actionsList(slashCommandInteraction, api);
             } else if (slashCommandInteraction.getCommandName().equals("gn")) {
                 gnMethod(slashCommandInteraction);
+            } else if (slashCommandInteraction.getCommandName().equals("emotes")) {
+                emotesCommand(slashCommandInteraction);
             }
 
         });
@@ -416,6 +419,18 @@ public class Main {
     private static void gnMethod(SlashCommandInteraction slashCommandInteraction) {
         slashCommandInteraction.createImmediateResponder()
                 .setContent(gnMessages[(int) (Math.random() * gnMessages.length)])
+                .respond();
+    }
+
+    private static void emotesCommand(SlashCommandInteraction slashCommandInteraction) {
+
+        StringBuilder result = new StringBuilder();
+        for (Emoji e : slashCommandInteraction.getServer().get().getCustomEmojis()) {
+            result.append(e.getMentionTag()).append(" ");
+        }
+        System.out.println(result.toString());
+        slashCommandInteraction.createImmediateResponder()
+                .setContent(result.toString())
                 .respond();
     }
 
