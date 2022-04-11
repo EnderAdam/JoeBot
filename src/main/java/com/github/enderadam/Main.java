@@ -44,7 +44,8 @@ public class Main {
             "Successful dump, dropped everything at the dump. It all worked out. And btw, I got a second load guys coming in if anybody wants to help me unload",
             "The next president of the United States; Barack America",
             "I promise you, the president has a big stick. I promise you.",
-            "America is a nation that can be defined in a single word. Asssfhhhtlllmmnfff"
+            "America is a nation that can be defined in a single word; as a foothills foot foot excuse me foothills in" +
+                    " Himalayas with XI JIPPINS travelling with him 17,000 miles when was VP I don't know what for a fact"
 
     };
 
@@ -295,6 +296,10 @@ public class Main {
                 .createGlobal(api)
                 .join();
         allCommands.add(quoteCommand);
+        SlashCommand allQuotesCommand = SlashCommand.with("allQuotes", "Gets all Joe quotes")
+                .createGlobal(api)
+                .join();
+        allCommands.add(allQuotesCommand);
 
         SlashCommand gnCommand = SlashCommand.with("gn", "Gets a Joe quote")
                 .createGlobal(api)
@@ -314,7 +319,6 @@ public class Main {
             SlashCommandInteraction slashCommandInteraction = event.getSlashCommandInteraction();
             if (slashCommandInteraction.getCommandName().equals("ping")) {
                 ping(slashCommandInteraction);
-
             } else if (slashCommandInteraction.getCommandName().equals("quote")) {
                 quote(slashCommandInteraction);
             } else if (slashCommandInteraction.getCommandName().equals("actions")) {
@@ -323,6 +327,8 @@ public class Main {
                 gnMethod(slashCommandInteraction);
             } else if (slashCommandInteraction.getCommandName().equals("emotes")) {
                 emotesCommand(slashCommandInteraction);
+            } else if (slashCommandInteraction.getCommandName().equals("allQuotes")) {
+                allQuotesCommand(slashCommandInteraction);
             }
 
         });
@@ -413,6 +419,15 @@ public class Main {
     private static void quote(SlashCommandInteraction slashCommandInteraction) {
         slashCommandInteraction.createImmediateResponder()
                 .setContent(quotes[(int) (Math.random() * quotes.length)])
+                .respond();
+    }
+    private static void allQuotesCommand(SlashCommandInteraction slashCommandInteraction) {
+        StringBuilder temp = new StringBuilder();
+        for (String s: quotes){
+            temp.append(s).append("\n");
+        }
+        slashCommandInteraction.createImmediateResponder()
+                .setContent(temp.toString())
                 .respond();
     }
 
