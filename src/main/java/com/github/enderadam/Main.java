@@ -44,7 +44,8 @@ public class Main {
             "How many times did you see people pulling up to McDonald’s, sitting outside during the pandemic so they could do their homework because they couldn’t get — get it off of their — their line?",
             "Successful dump, dropped everything at the dump. It all worked out. And btw, I got a second load guys coming in if anybody wants to help me unload",
             "The next president of the United States; Barack America",
-            "I promise you, the president has a big stick. I promise you."
+            "I promise you, the president has a big stick. I promise you.",
+            "America is a nation that can be defined in a single word. Asssfhhhtlllmmnfff"
 
     };
 
