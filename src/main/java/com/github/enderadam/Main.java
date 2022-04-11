@@ -231,22 +231,19 @@ public class Main {
                 StringBuilder toSend = new StringBuilder();
                 List<String> emojis = new ArrayList<>();
                 while (messageRead.length()>0){
-                    if (messageRead.charAt(0)==':'){
-                        messageRead = messageRead.substring(1);
-                        StringBuilder emojiToSend = new StringBuilder();
-                        while (messageRead.charAt(0)!=':'){
-                            System.out.println(messageRead.charAt(0));
-                            emojiToSend.append(messageRead.charAt(0));
-                            messageRead = messageRead.substring(1);
-                        }
-                        messageRead = messageRead.substring(1);
-                        System.out.println(emojiToSend.toString());
-                        emojis.add(allEmoji.get(emojiToSend.toString()).getMentionTag());
-                        toSend.append(allEmoji.get(emojiToSend.toString()).getMentionTag());
-                    } else {
+//                    if (messageRead.charAt(0)==':'){
+//                        messageRead = messageRead.substring(1);
+//                        StringBuilder emojiToSend = new StringBuilder();
+//                        while (messageRead.charAt(0)!=':'){
+//                            emojiToSend.append(messageRead.charAt(0));
+//                            messageRead = messageRead.substring(1);
+//                        }
+//                        messageRead = messageRead.substring(1);
+//                        toSend.append(allEmoji.get(emojiToSend.toString()).getMentionTag());
+//                    } else {
                         toSend.append(messageRead.charAt(0));
                         messageRead = messageRead.substring(1);
-                    }
+//                    }
                 }
                 event.getChannel().sendMessage(toSend.toString());
             }
