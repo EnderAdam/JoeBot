@@ -6,6 +6,7 @@ import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.invite.Invite;
 import org.javacord.api.entity.user.User;
@@ -28,8 +29,8 @@ public class Main {
     private static boolean sendImages = false;
     private static boolean kickPerson = false;
     private static boolean league = true;
-    private static List<Server> servers = new ArrayList<>();
-    private static HashMap<String, KnownCustomEmoji> allEmoji = new HashMap<>();
+    private static final List<Server> servers = new ArrayList<>();
+    private static final HashMap<String, KnownCustomEmoji> allEmoji = new HashMap<>();
 
     private static final String[] quotes = {"If you have a problem figuring out whether you’re for me or Trump, then you ain’t black.",
             "I may be Irish but I’m not stupid.",
@@ -151,7 +152,8 @@ public class Main {
                 }
             }
             if (league) {
-                if (message.getContent().toLowerCase(Locale.ROOT).contains("league") && !message.getAuthor().asUser().get().getIdAsString().equalsIgnoreCase("898438764907606066")) {
+                if ((message.getContent().toLowerCase(Locale.ROOT).contains("league") || (message.getContent().toLowerCase(Locale.ROOT).contains("tft")))
+                        && !message.getAuthor().asUser().get().getIdAsString().equalsIgnoreCase("898438764907606066")) {
                     Collection<User> usersInServer = message.getServer().get().getMembers();
                     List<User> leaguers = new ArrayList<>();
                     for (User u : usersInServer) {
@@ -301,7 +303,7 @@ public class Main {
                 .join();
         allCommands.add(allQuotesCommand);
 
-        SlashCommand gnCommand = SlashCommand.with("gn", "Gets a Joe quote")
+        SlashCommand gnCommand = SlashCommand.with("gn", "Says GoodNight")
                 .createGlobal(api)
                 .join();
         allCommands.add(gnCommand);
@@ -335,7 +337,7 @@ public class Main {
 
 
         // Print the invite url of your bot
-        System.out.println("You can invite the bot by using the following url: " + api.createBotInvite());
+        System.out.println("You can invite the bot by using the following url: " + api.createBotInvite(Permissions.fromBitmask(8)));
     }
 
     private static void giveMeJoeBot(Message message, boolean b) {
@@ -458,7 +460,7 @@ public class Main {
     private static String calculateActions() {
         StringBuilder result = new StringBuilder();
         for (SlashCommand com : allCommands) {
-            result.append(com.getName()).append("   ").append(com.getDescription()).append("\n");
+            result.append(com.getName()).append("\t\t\t").append(com.getDescription()).append("\n");
         }
         return result.toString();
     }
