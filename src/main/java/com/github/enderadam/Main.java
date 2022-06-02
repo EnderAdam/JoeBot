@@ -17,10 +17,11 @@ import org.javacord.api.interaction.SlashCommandInteraction;
 import javax.swing.Timer;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-
-//import org.json.simple.*;
 
 public class Main {
     private static final List<SlashCommand> allCommands = new ArrayList<>();
@@ -32,23 +33,7 @@ public class Main {
     private static final List<Server> servers = new ArrayList<>();
     private static final HashMap<String, KnownCustomEmoji> allEmoji = new HashMap<>();
 
-    private static final String[] quotes = {"If you have a problem figuring out whether you’re for me or Trump, then you ain’t black.",
-            "I may be Irish but I’m not stupid.",
-            "Poor kids are just as bright and just as talented as white kids.",
-            "I shouldn’t have been such a wise guy.",
-            "Eat some chocolate chocolate chip",
-            "I got hairy legs that turn blonde in the Sun. Kids used to come up and reach into the pool and rub my leg down. " +
-                    "\nI learned about roaches, I learned about kids jumping on my lap. And I love kids jumping on my lap.",
-            "Now we have over 120 million dead from COVID",
-            "I shouldn't have been such a wise guy",
-            "How many times did you see people pulling up to McDonald’s, sitting outside during the pandemic so they could do their homework because they couldn’t get — get it off of their — their line?",
-            "Successful dump, dropped everything at the dump. It all worked out. And btw, I got a second load guys coming in if anybody wants to help me unload",
-            "The next president of the United States; Barack America",
-            "I promise you, the president has a big stick. I promise you.",
-            "America is a nation that can be defined in a single word; as a foothills foot foot excuse me foothills in" +
-                    " Himalayas with XI JIPPINS travelling with him 17,000 miles when was VP I don't know what for a fact"
-
-    };
+    private static List<String> quotes;
 
     private static final String[] gnMessages = {"Goodnight girl, I see you tomorrow",
             "Goodnight Gays, Sleep Tight ||like my bussy||",
@@ -70,6 +55,11 @@ public class Main {
 //            i.deleteForServer(XXXX);
 //        }
 
+        try {
+            quotes = Files.readAllLines(Paths.get("src/main/resources/quotes.txt"), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         // Add a listener which answers with "Pong!" if someone writes "!ping"
         api.addMessageCreateListener(event -> {
             Message message = event.getMessage();
@@ -420,7 +410,7 @@ public class Main {
 
     private static void quote(SlashCommandInteraction slashCommandInteraction) {
         slashCommandInteraction.createImmediateResponder()
-                .setContent(quotes[(int) (Math.random() * quotes.length)])
+                .setContent(quotes.get((int) (Math.random() * quotes.size())))
                 .respond();
     }
 
