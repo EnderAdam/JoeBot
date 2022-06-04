@@ -1,5 +1,7 @@
 package com.github.enderadam;
 
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.Activity;
@@ -16,12 +18,15 @@ import org.javacord.api.interaction.SlashCommandInteraction;
 
 import javax.swing.Timer;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class Main {
     private static final List<SlashCommand> allCommands = new ArrayList<>();
@@ -32,6 +37,7 @@ public class Main {
     private static boolean league = true;
     private static final List<Server> servers = new ArrayList<>();
     private static final HashMap<String, KnownCustomEmoji> allEmoji = new HashMap<>();
+    private static final Gson gson = new Gson();
 
     private static List<String> quotes;
 
@@ -42,8 +48,9 @@ public class Main {
     };
 
     public static void main(String[] args) {
-        // Insert your bot's token here (Hidden)
         String token = System.getenv("TOKEN");
+        String database_url = System.getenv("DATABASE_URL");
+
 
         DiscordApi api = new DiscordApiBuilder().setAllIntents().setToken(token).login().join();
         System.out.println("api set");
@@ -63,68 +70,45 @@ public class Main {
         // Add a listener which answers with "Pong!" if someone writes "!ping"
         api.addMessageCreateListener(event -> {
             Message message = event.getMessage();
+            String username = event.getMessageAuthor().getName();
+
+//            try {
+//                Class.forName("com.mysql.cj.jdbc.Driver");
+//                Connection con = DriverManager
+//                        .getConnection(database_url);
+//                PreparedStatement statement = con.prepareStatement("CREATE TABLE IF NOT EXISTS " + message.getAuthor().getName());
+//                statement.executeUpdate();
+//                PreparedStatement statement1 = con.prepareStatement()
+//            } catch (ClassNotFoundException | SQLException e) {
+//                throw new RuntimeException(e);
+//            }
+
+//            try {
+//                PersonWords[] wordArray = gson.fromJson(new JsonReader(new FileReader("src/main/resources/words.json")), PersonWords[].class);
+//                ArrayList<PersonWords> people = new ArrayList<>();
+//                if (people.stream().map(x -> x.name).noneMatch(x -> x.equals(username))) {
+//                    people.add(new PersonWords(username, new ArrayList<>()));
+//                }
+//                for (String word : message.getContent().split(" ")) {
+//                    int indexOfUsername = people.indexOf(new PersonWords(username));
+//                    if (!people.get(indexOfUsername).words.contains(new Words(word))) {
+//                        people.get(indexOfUsername).words.add(new Words(word, 1));
+//                    } else {
+//                        int wordIndex = people.get(indexOfUsername).words.indexOf(new Words(word));
+//                        people.get(indexOfUsername).words.get(wordIndex).addOne();
+//                    }
+//                }
+//                if (message.getContent().contains("GIVEMEWORDS")) {
+//                    List<String> result =
+//                            people.stream().map(x -> x.words).flatMap(x -> x.stream().map(y -> y.count + "")).collect(Collectors.toList());
+//                    result.forEach(event.getChannel()::sendMessage);
+//                }
+//            } catch (FileNotFoundException e) {
+//                throw new RuntimeException(e);
+//            }
 
             //Toggles
-            if (message.getContent().equals("!kicking") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
-                isKicking = !isKicking;
-                message.getAuthor().asUser().get().sendMessage("Kicking is " + isKicking);
-            }
-            if (message.getContent().equals("!sendImages") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
-                sendImages = !sendImages;
-                message.getAuthor().asUser().get().sendMessage("Sending Images is " + sendImages);
-            }
-            if (message.getContent().equals("!kickPerson") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
-                kickPerson = !kickPerson;
-                message.getAuthor().asUser().get().sendMessage("Kicking Jamie is " + kickPerson);
-            }
-            if (message.getContent().equals("!league") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
-                league = !league;
-                message.getAuthor().asUser().get().sendMessage("League option is " + league);
-            }
-            if (message.getContent().contains("!changeNick") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
-                String[] parts = message.getContent().split(" ");
-                StringBuilder concatNick = new StringBuilder();
-                Server toChange = null;
-                if (parts[2].equals("ARA")) {
-                    toChange = ARA;
-                } else {
-                    toChange = XXXX;
-                }
-                for (int i = 3; i < parts.length; i++) {
-                    concatNick.append(" ").append(parts[i]);
-                }
-                changeNick(api.getUserById(parts[1]).join(), api, toChange, concatNick.toString());
-            }
-            if (message.getContent().contains("!servers") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
-//                message.getAuthor().asUser().get().sendMessage(ARA.getInvites().join().toString());
-                StringBuilder sb = new StringBuilder();
-                servers.clear();
-                for (Server server : api.getServers()) {
-                    sb.append(server.getName()).append("\n");
-                    servers.add(server);
-                    try {
-                        for (Invite invite : server.getInvites().join()) {
-                            sb.append(invite.getUrl()).append("\n");
-                        }
-                    } catch (java.util.concurrent.CompletionException ignored) {
-                    }
-                }
-                message.getAuthor().asUser().get().sendMessage(sb.toString());
-            }
-            if (message.getContent().contains("!listServer") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
-//                message.getAuthor().asUser().get().sendMessage(ARA.getInvites().join().toString());
-                StringBuilder sb = new StringBuilder();
-                Server serverToLook = servers.get(Integer.parseInt((message.getContent().split("!listServer")[1].substring(1))));
-                for (User u : serverToLook.getMembers()) {
-                    sb.append(u.getName() + "\n");
-                }
-                message.getAuthor().asUser().get().sendMessage(sb.toString());
-            }
-            if (message.getContent().contains("!activity") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
-                api.updateActivity((message.getContent().split("!activity")[1]));
-            } else if (message.getContent().contains("!unsetactivity") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
-                api.unsetActivity();
-            }
+            toggles(api, XXXX, ARA, message);
 
             for (KnownCustomEmoji emoji : api.getCustomEmojis()) {
                 if (allEmoji.containsKey(emoji.getName())) {
@@ -240,11 +224,29 @@ public class Main {
                 event.getChannel().sendMessage(toSend.toString());
             }
             if (message.getContent().toLowerCase().contains("joe")) {
-                if (Math.random() < 0.15) {
+                double random = Math.random();
+                if (random < 0.01) {
+                    event.getChannel().sendMessage("https://tenor.com/view/axanar-alecpeters-axamonitor-monkey-ape-gif-18121300");
+                    message.getChannel().sendMessage("Responded to: " + message.getAuthor().getName());
+                } else if (random < 0.06) {
+                    event.getChannel().sendMessage("https://tenor.com/view/kanye-joe-stare-gif-19284974");
+                    message.getChannel().sendMessage("Responded to: " + message.getAuthor().getName());
+                } else if (random < 0.21) {
                     event.getChannel().sendMessage("https://tenor.com/view/hey-joe-monkey-monkey-joe-monkey-heart-love-joe-gif-23020196");
                     message.getChannel().sendMessage("Responded to: " + message.getAuthor().getName());
-                } else if (Math.random() < 0.05) {
-                    event.getChannel().sendMessage("https://tenor.com/view/axanar-alecpeters-axamonitor-monkey-ape-gif-18121300");
+                }
+            }
+            if (message.getContent().toLowerCase().contains("ratio")) {
+                double random = Math.random();
+                if (random < 0.2) {
+                    event.getChannel().sendMessage("https://tenor.com/view/yakuza-ratio-denied-gif-22244085");
+                    message.getChannel().sendMessage("Responded to: " + message.getAuthor().getName());
+                }
+            }
+            if (message.getContent().toLowerCase().contains("ratio denied") || message.getContent().toLowerCase().contains("ratio-denied")) {
+                double random = Math.random();
+                if (random < 0.05) {
+                    event.getChannel().sendMessage("https://tenor.com/view/ratio-denied-ratio-denied-denied-you-fell-off-bozo-gif-24795104");
                     message.getChannel().sendMessage("Responded to: " + message.getAuthor().getName());
                 }
             }
@@ -328,6 +330,69 @@ public class Main {
 
         // Print the invite url of your bot
         System.out.println("You can invite the bot by using the following url: " + api.createBotInvite(Permissions.fromBitmask(8)));
+    }
+
+    private static void toggles(DiscordApi api, Server XXXX, Server ARA, Message message) {
+        if (message.getContent().equals("!kicking") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
+            isKicking = !isKicking;
+            message.getAuthor().asUser().get().sendMessage("Kicking is " + isKicking);
+        }
+        if (message.getContent().equals("!sendImages") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
+            sendImages = !sendImages;
+            message.getAuthor().asUser().get().sendMessage("Sending Images is " + sendImages);
+        }
+        if (message.getContent().equals("!kickPerson") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
+            kickPerson = !kickPerson;
+            message.getAuthor().asUser().get().sendMessage("Kicking Jamie is " + kickPerson);
+        }
+        if (message.getContent().equals("!league") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
+            league = !league;
+            message.getAuthor().asUser().get().sendMessage("League option is " + league);
+        }
+        if (message.getContent().contains("!changeNick") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
+            String[] parts = message.getContent().split(" ");
+            StringBuilder concatNick = new StringBuilder();
+            Server toChange = null;
+            if (parts[2].equals("ARA")) {
+                toChange = ARA;
+            } else {
+                toChange = XXXX;
+            }
+            for (int i = 3; i < parts.length; i++) {
+                concatNick.append(" ").append(parts[i]);
+            }
+            changeNick(api.getUserById(parts[1]).join(), api, toChange, concatNick.toString());
+        }
+        if (message.getContent().contains("!servers") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
+//                message.getAuthor().asUser().get().sendMessage(ARA.getInvites().join().toString());
+            StringBuilder sb = new StringBuilder();
+            servers.clear();
+            for (Server server : api.getServers()) {
+                sb.append(server.getName()).append("\n");
+                servers.add(server);
+                try {
+                    for (Invite invite : server.getInvites().join()) {
+                        sb.append(invite.getUrl()).append("\n");
+                    }
+                } catch (java.util.concurrent.CompletionException ignored) {
+                }
+            }
+            message.getAuthor().asUser().get().sendMessage(sb.toString());
+        }
+        if (message.getContent().contains("!listServer") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
+//                message.getAuthor().asUser().get().sendMessage(ARA.getInvites().join().toString());
+            StringBuilder sb = new StringBuilder();
+            Server serverToLook = servers.get(Integer.parseInt((message.getContent().split("!listServer")[1].substring(1))));
+            for (User u : serverToLook.getMembers()) {
+                sb.append(u.getName() + "\n");
+            }
+            message.getAuthor().asUser().get().sendMessage(sb.toString());
+        }
+        if (message.getContent().contains("!activity") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
+            api.updateActivity((message.getContent().split("!activity")[1]));
+        } else if (message.getContent().contains("!unsetactivity") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
+            api.unsetActivity();
+        }
     }
 
     private static void giveMeJoeBot(Message message, boolean b) {
