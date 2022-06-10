@@ -25,6 +25,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -222,6 +223,11 @@ public class Main {
 //                    }
                 }
                 event.getChannel().sendMessage(toSend.toString());
+            } else if (message.getContent().contains("!react") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
+                String messageRead = message.getContent();
+                String[] contents = messageRead.split(" ");
+                CompletableFuture<Message> temp = api.getMessageById(contents[1], api.getTextChannelById(contents[2]).get());
+                temp.thenApply(x -> x.addReaction(contents[3]));
             }
             if (message.getContent().toLowerCase().contains("joe")) {
                 double random = Math.random();
