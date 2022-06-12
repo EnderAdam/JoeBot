@@ -227,7 +227,20 @@ public class Main {
                 String messageRead = message.getContent();
                 String[] contents = messageRead.split(" ");
                 CompletableFuture<Message> temp = api.getMessageById(contents[1], api.getTextChannelById(contents[2]).get());
-                temp.thenApply(x -> x.addReaction(contents[3]));
+                if (allEmoji.containsKey(contents[3])) {
+                    temp.thenApply(x -> x.addReaction(allEmoji.get(contents[3])));
+                } else {
+                    temp.thenApply(x -> x.addReaction(contents[3]));
+                }
+            } else if (message.getContent().contains("!unreact") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
+                String messageRead = message.getContent();
+                String[] contents = messageRead.split(" ");
+                CompletableFuture<Message> temp = api.getMessageById(contents[1], api.getTextChannelById(contents[2]).get());
+                if (allEmoji.containsKey(contents[3])) {
+                    temp.thenApply(x -> x.removeReactionByEmoji(allEmoji.get(contents[3])));
+                } else {
+                    temp.thenApply(x -> x.removeReactionByEmoji(contents[3]));
+                }
             }
             if (message.getContent().toLowerCase().contains("joe")) {
                 double random = Math.random();
