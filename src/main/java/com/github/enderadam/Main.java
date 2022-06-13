@@ -203,7 +203,7 @@ public class Main {
             }
             if (Arrays.asList(message.getContent().toLowerCase().split(" ")).contains("clearly")) {
                 message.addReaction(allEmoji.get("clearly"));
-            } else if (Arrays.asList(message.getContent().toLowerCase().split(" ")).contains("skill issue")) {
+            } else if (message.getContent().toLowerCase().contains("skill issue")) {
                 message.addReaction(allEmoji.get("clearly"));
             }
             if (message.getContent().contains("!say") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
@@ -359,6 +359,7 @@ public class Main {
 
         // Print the invite url of your bot
         System.out.println("You can invite the bot by using the following url: " + api.createBotInvite(Permissions.fromBitmask(8)));
+        api.getUserById("246637425961467904").thenApply(x -> x.sendMessage("Restarted Bot"));
     }
 
     private static void toggles(DiscordApi api, Server XXXX, Server ARA, Message message) {
