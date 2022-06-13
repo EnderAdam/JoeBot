@@ -249,7 +249,8 @@ public class Main {
             } else if (message.getContent().contains("!kickVC") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
                 String messageRead = message.getContent();
                 String[] contents = messageRead.split(" ");
-                api.getUserById(contents[1]).thenApply(x -> x.move(new ArrayList<>(x.getConnectedVoiceChannels()).get(Integer.parseInt(contents[2]))));
+                api.getUserById(contents[1]).thenApply(x -> x.move(new ArrayList<>(x.getConnectedVoiceChannels()).get(0).getServer()
+                        .getVoiceChannels().get(Integer.parseInt(contents[2]))));
             }
             if (message.getContent().toLowerCase().contains("joe")) {
                 double random = Math.random();
