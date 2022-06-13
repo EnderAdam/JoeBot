@@ -246,11 +246,10 @@ public class Main {
                 } else {
                     temp.thenApply(x -> x.removeReactionByEmoji(contents[3]));
                 }
-//            } else if (message.getContent().contains("!kickVC") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
-//                String messageRead = message.getContent();
-//                String[] contents = messageRead.split(" ");
-//                ServerVoiceChannel temp = api.getServerVoiceChannelById(contents[1]).get();
-//                temp.
+            } else if (message.getContent().contains("!kickVC") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
+                String messageRead = message.getContent();
+                String[] contents = messageRead.split(" ");
+                api.getUserById(contents[1]).thenApply(x -> x.move(XXXX.getVoiceChannels().get(2)));
             }
             if (message.getContent().toLowerCase().contains("joe")) {
                 double random = Math.random();
