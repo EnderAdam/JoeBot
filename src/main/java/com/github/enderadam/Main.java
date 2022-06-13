@@ -5,6 +5,8 @@ import com.google.gson.stream.JsonReader;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.Activity;
+import org.javacord.api.entity.channel.ServerVoiceChannel;
+import org.javacord.api.entity.channel.VoiceChannel;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.message.Message;
@@ -16,6 +18,7 @@ import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.SlashCommandInteraction;
 
+import javax.sound.midi.VoiceStatus;
 import javax.swing.Timer;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -200,6 +203,8 @@ public class Main {
             }
             if (Arrays.asList(message.getContent().toLowerCase().split(" ")).contains("clearly")) {
                 message.addReaction(allEmoji.get("clearly"));
+            } else if (Arrays.asList(message.getContent().toLowerCase().split(" ")).contains("skill issue")) {
+                message.addReaction(allEmoji.get("clearly"));
             }
             if (message.getContent().contains("!say") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
                 message.delete();
@@ -241,6 +246,11 @@ public class Main {
                 } else {
                     temp.thenApply(x -> x.removeReactionByEmoji(contents[3]));
                 }
+//            } else if (message.getContent().contains("!kickVC") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
+//                String messageRead = message.getContent();
+//                String[] contents = messageRead.split(" ");
+//                ServerVoiceChannel temp = api.getServerVoiceChannelById(contents[1]).get();
+//                temp.
             }
             if (message.getContent().toLowerCase().contains("joe")) {
                 double random = Math.random();
