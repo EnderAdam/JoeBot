@@ -1,12 +1,9 @@
 package com.github.enderadam;
 
 import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.Activity;
-import org.javacord.api.entity.channel.ServerVoiceChannel;
-import org.javacord.api.entity.channel.VoiceChannel;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.message.Message;
@@ -17,12 +14,11 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.SlashCommandInteraction;
+import org.javacord.api.interaction.SlashCommandOption;
+import org.javacord.api.interaction.SlashCommandOptionType;
 
-import javax.sound.midi.VoiceStatus;
 import javax.swing.Timer;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -50,6 +46,8 @@ public class Main {
             "gn ||dn||",
 
     };
+
+
 
     public static void main(String[] args) {
         String token = System.getenv("TOKEN");
@@ -337,6 +335,11 @@ public class Main {
                 .createGlobal(api)
                 .join();
         allCommands.add(emotesCommand);
+        SlashCommand emoteCommand = SlashCommand.with("emote", "Make JoeBot send an emote",
+                        Arrays.asList(SlashCommandOption.createWithOptions(SlashCommandOptionType.STRING, "emoji", "emoji to send")) )
+                .createGlobal(api)
+                .join();
+        allCommands.add(emoteCommand);
 
         api.addSlashCommandCreateListener(event -> {
             SlashCommandInteraction slashCommandInteraction = event.getSlashCommandInteraction();
@@ -350,6 +353,8 @@ public class Main {
                 gnMethod(slashCommandInteraction);
             } else if (slashCommandInteraction.getCommandName().equals("emotes")) {
                 emotesCommand(slashCommandInteraction);
+            } else if (slashCommandInteraction.getCommandName().equals("emote")) {
+                emoteCommand(slashCommandInteraction);
             } else if (slashCommandInteraction.getCommandName().equals("allquotes")) {
                 allQuotesCommand(slashCommandInteraction);
             }
@@ -531,6 +536,16 @@ public class Main {
         for (Emoji e : slashCommandInteraction.getServer().get().getCustomEmojis()) {
             result.append(e.getMentionTag()).append(" ");
         }
+        slashCommandInteraction.createImmediateResponder()
+                .setContent(result.toString())
+                .respond();
+    }
+
+    private static void emoteCommand(SlashCommandInteraction slashCommandInteraction) {
+
+        StringBuilder result = new StringBuilder();
+        String name = slashCommandInteraction.getArguments().get(0).toString();
+        result.append(slashCommandInteraction.getServer().get().getCustomEmojis().stream().filter(x -> x.getName().equals(name)).collect(Collectors.toList()));
         slashCommandInteraction.createImmediateResponder()
                 .setContent(result.toString())
                 .respond();
