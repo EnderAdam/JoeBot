@@ -48,7 +48,6 @@ public class Main {
     };
 
 
-
     public static void main(String[] args) {
         String token = System.getenv("TOKEN");
         String database_url = System.getenv("DATABASE_URL");
@@ -147,7 +146,7 @@ public class Main {
                         StringBuilder leaguersToPrint = new StringBuilder();
                         leaguersToPrint.append("These losers are currently playing League:\n");
                         for (User u : leaguers) {
-                            leaguersToPrint.append(u.getMentionTag()).append("\n");
+                            leaguersToPrint.append(u.getMentionTag()).append("\t").append(u.getActivities().iterator().next().getStartTime().get()).append("\n");
                         }
                         if (leaguers.size() >= 3) {
                             leaguersToPrint.append("Combo!! We have ").append(leaguers.size()).append(" losers");
