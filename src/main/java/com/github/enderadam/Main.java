@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.Activity;
+import org.javacord.api.entity.activity.ActivityAssets;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.message.Message;
@@ -147,7 +148,7 @@ public class Main {
                         leaguersToPrint.append("These losers are currently playing League:\n");
                         for (User u : leaguers) {
                             leaguersToPrint.append(u.getMentionTag()).append("\t");
-                            leaguersToPrint.append(u.getActivities().iterator().next().getAssets().get());
+                            leaguersToPrint.append(u.getActivities().iterator().next().getStartTime().isPresent() ? u.getActivities().iterator().next().getStartTime().get().toString() : "").append("\n");
                             leaguersToPrint.append("\n");
                         }
                         if (leaguers.size() >= 3) {
@@ -571,4 +572,12 @@ public class Main {
         user.updateNickname(server, newNick);
     }
 
+    private static String getActivityInfo(ActivityAssets a){
+        StringBuilder result = new StringBuilder();
+        a.getLargeImage().ifPresent(x-> result.append(x.asBufferedImage().toString()));
+        a.getSmallImage().ifPresent(x-> result.append(x.asBufferedImage().toString()));
+        a.getLargeImage().ifPresent(result::append);
+        a.getSmallText().ifPresent(result::append);
+        return result.toString();
+    }
 }
