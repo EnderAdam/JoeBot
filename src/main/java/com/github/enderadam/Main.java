@@ -150,8 +150,9 @@ public class Main {
                             leaguersToPrint.append(u.getMentionTag()).append("\t");
                             for (Activity a : u.getActivities()) {
                                 if (a.getName().toLowerCase(Locale.ROOT).contains("league")) {
-                                    leaguersToPrint.append(a.getStartTime().get()).append("\t");
+                                    leaguersToPrint.append(getActivityInfo(a.getAssets())).append("\t");
                                     leaguersToPrint.append(a.getDetails().isPresent() ? a.getDetails().get() : "").append("\t");
+                                    leaguersToPrint.append(a.getStartTime().isPresent() ? a.getStartTime().get().toString() : "").append("\t");
                                 }
                             }
                             leaguersToPrint.append("\n");
@@ -577,11 +578,15 @@ public class Main {
         user.updateNickname(server, newNick);
     }
 
-    private static String getActivityInfo(ActivityAssets a){
+    private static String getActivityInfo(Optional<ActivityAssets> opt){
+        if (!opt.isPresent()) {
+            return "";
+        }
+        ActivityAssets a = opt.get();
         StringBuilder result = new StringBuilder();
-        a.getLargeImage().ifPresent(x-> result.append(x.asBufferedImage().toString()));
-        a.getSmallImage().ifPresent(x-> result.append(x.asBufferedImage().toString()));
-        a.getLargeImage().ifPresent(result::append);
+//        a.getLargeImage().ifPresent(x-> result.append(x.getUrl().toString()));
+//        a.getSmallImage().ifPresent(x-> result.append(x.getUrl().toString()));
+        a.getLargeText().ifPresent(result::append);
         a.getSmallText().ifPresent(result::append);
         return result.toString();
     }
