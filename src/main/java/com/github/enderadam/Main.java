@@ -146,7 +146,9 @@ public class Main {
                         StringBuilder leaguersToPrint = new StringBuilder();
                         leaguersToPrint.append("These losers are currently playing League:\n");
                         for (User u : leaguers) {
-                            leaguersToPrint.append(u.getMentionTag()).append("\t").append(u.getActivities().iterator().next().getStartTime().get()).append("\n");
+                            leaguersToPrint.append(u.getMentionTag()).append("\t");
+                            leaguersToPrint.append(u.getActivities().iterator().next().getAssets().get());
+                            leaguersToPrint.append("\n");
                         }
                         if (leaguers.size() >= 3) {
                             leaguersToPrint.append("Combo!! We have ").append(leaguers.size()).append(" losers");
