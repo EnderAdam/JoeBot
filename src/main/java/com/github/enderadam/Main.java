@@ -148,7 +148,12 @@ public class Main {
                         leaguersToPrint.append("These losers are currently playing League:\n");
                         for (User u : leaguers) {
                             leaguersToPrint.append(u.getMentionTag()).append("\t");
-                            leaguersToPrint.append(u.getActivities().iterator().next().getStartTime().isPresent() ? u.getActivities().iterator().next().getStartTime().get().toString() : "").append("\n");
+                            for (Activity a : u.getActivities()) {
+                                if (a.getName().toLowerCase(Locale.ROOT).contains("league")) {
+                                    leaguersToPrint.append(a.getStartTime().get()).append("\t");
+                                    leaguersToPrint.append(a.getDetails().isPresent() ? a.getDetails().get() : "").append("\t");
+                                }
+                            }
                             leaguersToPrint.append("\n");
                         }
                         if (leaguers.size() >= 3) {
