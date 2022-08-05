@@ -128,7 +128,7 @@ public class Main {
                 }
             }
             if (league) {
-                if ((message.getContent().toLowerCase(Locale.ROOT).contains("league") || (message.getContent().toLowerCase(Locale.ROOT).contains("tft")))
+                if ((message.getContent().toLowerCase(Locale.ROOT).contains("league of legends") || (message.getContent().toLowerCase(Locale.ROOT).contains("tft")))
                         && !message.getAuthor().asUser().get().getIdAsString().equalsIgnoreCase("898438764907606066")) {
                     Collection<User> usersInServer = message.getServer().get().getMembers();
                     List<User> leaguers = new ArrayList<>();
