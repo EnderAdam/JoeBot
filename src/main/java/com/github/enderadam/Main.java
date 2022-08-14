@@ -71,6 +71,7 @@ public class Main {
         }
         // Add a listener which answers with "Pong!" if someone writes "!ping"
         api.addMessageCreateListener(event -> {
+            System.out.println(event.getMessage().getContent());
             Message message = event.getMessage();
             String username = event.getMessageAuthor().getName();
 
