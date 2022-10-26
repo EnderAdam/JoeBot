@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -153,7 +155,11 @@ public class Main {
                                 if (a.getName().toLowerCase(Locale.ROOT).contains("league")) {
                                     leaguersToPrint.append(getActivityInfo(a.getAssets())).append("\t");
                                     leaguersToPrint.append(a.getDetails().isPresent() ? a.getDetails().get() : "").append("\t");
-                                    leaguersToPrint.append(a.getStartTime().isPresent() ? a.getStartTime().get().toString() : "").append("\t");
+                                    // add how long they have been playing for in minutes:seconds
+                                    if (a.getStartTime().isPresent()) {
+                                        long time = a.getStartTime().get().until(Instant.now(), ChronoUnit.SECONDS);
+                                        leaguersToPrint.append(time / 60).append(":").append(time % 60).append("\t");
+                                    }
                                 }
                             }
                             leaguersToPrint.append("\n");
@@ -345,7 +351,7 @@ public class Main {
                 .join();
         allCommands.add(emotesCommand);
         SlashCommand emoteCommand = SlashCommand.with("emote", "Make JoeBot send an emote",
-                        Arrays.asList(SlashCommandOption.createWithOptions(SlashCommandOptionType.STRING, "emoji", "emoji to send")) )
+                        Arrays.asList(SlashCommandOption.createWithOptions(SlashCommandOptionType.STRING, "emoji", "emoji to send")))
                 .createGlobal(api)
                 .join();
         allCommands.add(emoteCommand);
@@ -579,7 +585,7 @@ public class Main {
         user.updateNickname(server, newNick);
     }
 
-    private static String getActivityInfo(Optional<ActivityAssets> opt){
+    private static String getActivityInfo(Optional<ActivityAssets> opt) {
         if (!opt.isPresent()) {
             return "";
         }
