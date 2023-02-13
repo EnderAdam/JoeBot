@@ -1,6 +1,8 @@
 package com.github.enderadam;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.Activity;
@@ -17,10 +19,8 @@ import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.interaction.*;
 
 import javax.swing.Timer;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -552,7 +552,7 @@ public class Main {
     }
 
     private static void yodayoCommand(SlashCommandInteraction slashCommandInteraction) {
-        // Couldnt figure out how to make options required for javacord so this is a workaround
+        // Couldn't figure out how to make options required for javacord so this is a workaround
         if (slashCommandInteraction.getArguments().size() != 2 || slashCommandInteraction.getArguments().get(1).getDecimalValue().isEmpty()) {
             slashCommandInteraction.createImmediateResponder()
                     .setContent("Both arguments are required")
@@ -561,29 +561,71 @@ public class Main {
             return;
         }
 
-        var prompt = slashCommandInteraction.getArguments().get(0).getStringValue();
+        var prompt = slashCommandInteraction.getArguments().get(0).getStringValue().get();
         var model = slashCommandInteraction.getArguments().get(1).getDecimalValue().get();
         var modelString = yodayoModels.get((int) (model - 1));
 
         // Send the request to the site and respond to the user
         slashCommandInteraction.respondLater().thenAccept(interaction -> {
             String command =
-                    "curl " + generateUUID() + " -X POST -H \"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0\" -H \"Accept: application/json, text/plain, */*\" -H \"Accept-Language: en-US,en;q=0.5\" -H \"Accept-Encoding: gzip, deflate, br\" -H \"X-CSRF-Token: ktZk/aH7plhzkNHl/JlwJUY2gYt+MhPAK2o3uwTNMzaVwwifKv1sHqdD44d2W4IRLhCCWulbU4ryF5HdDRbAdg==\" -H \"Content-Type: application/json\" -H \"Origin: https://yodayo.com\" -H \"Connection: keep-alive\" -H \"Referer: https://yodayo.com/\" -H \"Cookie: _gorilla_csrf=MTY3NjI0OTEzNnxJa0o0Vm5OWmIzTkhlV3RpVlRCNlNtbHBjMHg1VGtkbmJVRTVSMWhoVlVKTE1sZ3liVnBuYm1JNE1FRTlJZ289fGzp1RN7qxeKAs31FdX9q6oSIvhM4iviicVD8oyfA8DA; a; session_uuid=d739811b-6738-421b-bc13-e1874f2a2b10\" -H \"Sec-Fetch-Dest: empty\" -H \"Sec-Fetch-Mode: cors\" -H \"Sec-Fetch-Site: same-site\" -H \"TE: trailers\" --data-raw \"{\"\"prompt\"\":\"\"" + prompt + "\"\",\"\"negative_prompt\"\":\"\"(bad_prompt:0.8),  lowres, text, error, cropped, worst quality, low quality, jpeg artifacts, ugly, duplicate, morbid, mutilated, out of frame, extra fingers, mutated hands, poorly drawn hands, poorly drawn face, mutation, deformed, blurry, dehydrated, bad anatomy, bad proportions, extra limbs, cloned face, disfigured, gross proportions, malformed limbs, missing arms, missing legs, extra arms, extra legs, fused fingers, too many fingers, long neck, username, watermark, signature,(((deformed))), ^[blurry^], (poorly drawn hands)\"\",\"\"model\"\":\"\"" + modelString + "\"\",\"\"sampling_steps\"\":20,\"\"sampling_method\"\":\"\"k_euler_ancestral\"\",\"\"cfg_scale\"\":10,\"\"height\"\":768,\"\"width\"\":512,\"\"seed\"\":-1,\"\"priority\"\":\"\"low\"\"}\"";
+                    "curl " + generateUUID() + " -X POST -H \"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0\" -H \"Accept: application/json, text/plain, */*\" -H \"Accept-Language: en-US,en;q=0.5\" -H \"X-CSRF-Token: ktZk/aH7plhzkNHl/JlwJUY2gYt+MhPAK2o3uwTNMzaVwwifKv1sHqdD44d2W4IRLhCCWulbU4ryF5HdDRbAdg==\" -H \"Content-Type: application/json\" -H \"Origin: https://yodayo.com\" -H \"Connection: keep-alive\" -H \"Referer: https://yodayo.com/\" -H \"Cookie: _gorilla_csrf=MTY3NjI0OTEzNnxJa0o0Vm5OWmIzTkhlV3RpVlRCNlNtbHBjMHg1VGtkbmJVRTVSMWhoVlVKTE1sZ3liVnBuYm1JNE1FRTlJZ289fGzp1RN7qxeKAs31FdX9q6oSIvhM4iviicVD8oyfA8DA; a; session_uuid=d739811b-6738-421b-bc13-e1874f2a2b10\" -H \"Sec-Fetch-Dest: empty\" -H \"Sec-Fetch-Mode: cors\" -H \"Sec-Fetch-Site: same-site\" -H \"TE: trailers\" --data-raw \"{\"\"prompt\"\":\"\"" + prompt + "\"\",\"\"negative_prompt\"\":\"\"(bad_prompt:0.8),  lowres, text, error, cropped, worst quality, low quality, jpeg artifacts, ugly, duplicate, morbid, mutilated, out of frame, extra fingers, mutated hands, poorly drawn hands, poorly drawn face, mutation, deformed, blurry, dehydrated, bad anatomy, bad proportions, extra limbs, cloned face, disfigured, gross proportions, malformed limbs, missing arms, missing legs, extra arms, extra legs, fused fingers, too many fingers, long neck, username, watermark, signature,(((deformed))), ^[blurry^], (poorly drawn hands)\"\",\"\"model\"\":\"\"" + modelString + "\"\",\"\"sampling_steps\"\":20,\"\"sampling_method\"\":\"\"k_euler_ancestral\"\",\"\"cfg_scale\"\":10,\"\"height\"\":768,\"\"width\"\":512,\"\"seed\"\":-1,\"\"priority\"\":\"\"low\"\"}\"";
 
+            String uuid = "";
             try {
                 Process process = Runtime.getRuntime().exec(command);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    System.out.println(line);
-                }
+                var json = gson.fromJson(new InputStreamReader(process.getInputStream()), JsonObject.class);
+                uuid = json.get("uuid").getAsString();
             } catch (IOException ignored) {
                 //Cry about it
+                return;
             }
 
             interaction.setContent("Request sent");
             interaction.update();
+
+            // Create a new completeableFuture to wait 25 minutes then download and send the image to the channel
+            String finalUuid = uuid;
+            CompletableFuture.runAsync(() -> {
+                try {
+                    Thread.sleep(1500000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    String getCommand = "curl \"https://api.yodayo.com/v1/text_to_images?offset=0&limit=25\" -H \"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0\" -H \"Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8\" -H \"Accept-Language: en-US,en;q=0.5\" -H \"Connection: keep-alive\" -H \"Cookie: _gorilla_csrf=MTY3NjI0OTEzNnxJa0o0Vm5OWmIzTkhlV3RpVlRCNlNtbHBjMHg1VGtkbmJVRTVSMWhoVlVKTE1sZ3liVnBuYm1JNE1FRTlJZ289fGzp1RN7qxeKAs31FdX9q6oSIvhM4iviicVD8oyfA8DA; a; session_uuid=d739811b-6738-421b-bc13-e1874f2a2b10\" -H \"Upgrade-Insecure-Requests: 1\" -H \"Sec-Fetch-Dest: document\" -H \"Sec-Fetch-Mode: navigate\" -H \"Sec-Fetch-Site: none\" -H \"Sec-Fetch-User: ?1\"";
+                    Process p = Runtime.getRuntime().exec(getCommand);
+                    var json = gson.fromJson(new InputStreamReader(p.getInputStream()), JsonObject.class);
+                    var data = json.get("text_to_images").getAsJsonArray();
+                    for (JsonElement e : data) {
+                        var uuid2 = e.getAsJsonObject().get("uuid").getAsString();
+                        if (uuid2.equals(finalUuid)) {
+                            var url = e.getAsJsonObject().get("output_image_url").getAsString();
+                            var file = new File(uuid2 + ".png");
+
+                            // Save to the file
+                            BufferedInputStream in = new BufferedInputStream(new URL(url).openStream());
+                            FileOutputStream fileOutputStream = new FileOutputStream(file);
+                            byte dataBuffer[] = new byte[1024];
+                            int bytesRead;
+                            while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                                fileOutputStream.write(dataBuffer, 0, bytesRead);
+                            }
+
+                            interaction.addAttachment(file);
+                            interaction.setContent("Here you go");
+                            interaction.update();
+
+                            // Delete the file after finishing with it
+                            file.delete();
+                            return;
+                        }
+                    }
+
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
         });
 
     }
