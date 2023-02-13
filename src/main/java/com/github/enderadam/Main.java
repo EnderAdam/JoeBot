@@ -8,19 +8,19 @@ import org.javacord.api.entity.activity.ActivityAssets;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.invite.Invite;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
-import org.javacord.api.interaction.SlashCommand;
-import org.javacord.api.interaction.SlashCommandInteraction;
-import org.javacord.api.interaction.SlashCommandOption;
-import org.javacord.api.interaction.SlashCommandOptionType;
+import org.javacord.api.interaction.*;
 
 import javax.swing.Timer;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -49,6 +49,9 @@ public class Main {
             "gn ||dn||",
 
     };
+
+    public static ArrayList<String> yodayoModels = new ArrayList<>(List.of("stable-diffusion-anime", "holo-waifu", "pastel", "abyss-diffusion", "niji", "sd-anime-classic", "kribo", "konosuba", "bocchi", "ojiberry"));
+
 
 
     public static void main(String[] args) {
@@ -356,6 +359,13 @@ public class Main {
                 .join();
         allCommands.add(emoteCommand);
 
+        SlashCommand yodayoCommand = SlashCommand.with("yodayo", "Query Yodayo with a provided query and model (both options required)",
+                Arrays.asList(SlashCommandOption.createWithOptions(SlashCommandOptionType.STRING, "query", "query to search"),
+                        SlashCommandOption.createWithOptions(SlashCommandOptionType.DECIMAL, "model", "model to use (1-10)")))
+                .createGlobal(api)
+                .join();
+        allCommands.add(yodayoCommand);
+
         api.addSlashCommandCreateListener(event -> {
             SlashCommandInteraction slashCommandInteraction = event.getSlashCommandInteraction();
             if (slashCommandInteraction.getCommandName().equals("ping")) {
@@ -372,6 +382,8 @@ public class Main {
                 emoteCommand(slashCommandInteraction);
             } else if (slashCommandInteraction.getCommandName().equals("allquotes")) {
                 allQuotesCommand(slashCommandInteraction);
+            } else if (slashCommandInteraction.getCommandName().equals("yodayo")) {
+                yodayoCommand(slashCommandInteraction);
             }
 
         });
@@ -537,6 +549,53 @@ public class Main {
         slashCommandInteraction.createImmediateResponder()
                 .setContent(temp.toString())
                 .respond();
+    }
+
+    private static void yodayoCommand(SlashCommandInteraction slashCommandInteraction) {
+        // Couldnt figure out how to make options required for javacord so this is a workaround
+        if (slashCommandInteraction.getArguments().size() != 2 || slashCommandInteraction.getArguments().get(1).getDecimalValue().isEmpty()) {
+            slashCommandInteraction.createImmediateResponder()
+                    .setContent("Both arguments are required")
+                    .setFlags(MessageFlag.EPHEMERAL)
+                    .respond();
+            return;
+        }
+
+        var prompt = slashCommandInteraction.getArguments().get(0).getStringValue();
+        var model = slashCommandInteraction.getArguments().get(1).getDecimalValue().get();
+        var modelString = yodayoModels.get((int) (model - 1));
+
+        // Send the request to the site and respond to the user
+        slashCommandInteraction.respondLater().thenAccept(interaction -> {
+            String command =
+                    "curl " + generateUUID() + " -X POST -H \"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0\" -H \"Accept: application/json, text/plain, */*\" -H \"Accept-Language: en-US,en;q=0.5\" -H \"Accept-Encoding: gzip, deflate, br\" -H \"X-CSRF-Token: ktZk/aH7plhzkNHl/JlwJUY2gYt+MhPAK2o3uwTNMzaVwwifKv1sHqdD44d2W4IRLhCCWulbU4ryF5HdDRbAdg==\" -H \"Content-Type: application/json\" -H \"Origin: https://yodayo.com\" -H \"Connection: keep-alive\" -H \"Referer: https://yodayo.com/\" -H \"Cookie: _gorilla_csrf=MTY3NjI0OTEzNnxJa0o0Vm5OWmIzTkhlV3RpVlRCNlNtbHBjMHg1VGtkbmJVRTVSMWhoVlVKTE1sZ3liVnBuYm1JNE1FRTlJZ289fGzp1RN7qxeKAs31FdX9q6oSIvhM4iviicVD8oyfA8DA; a; session_uuid=d739811b-6738-421b-bc13-e1874f2a2b10\" -H \"Sec-Fetch-Dest: empty\" -H \"Sec-Fetch-Mode: cors\" -H \"Sec-Fetch-Site: same-site\" -H \"TE: trailers\" --data-raw \"{\"\"prompt\"\":\"\"" + prompt + "\"\",\"\"negative_prompt\"\":\"\"(bad_prompt:0.8),  lowres, text, error, cropped, worst quality, low quality, jpeg artifacts, ugly, duplicate, morbid, mutilated, out of frame, extra fingers, mutated hands, poorly drawn hands, poorly drawn face, mutation, deformed, blurry, dehydrated, bad anatomy, bad proportions, extra limbs, cloned face, disfigured, gross proportions, malformed limbs, missing arms, missing legs, extra arms, extra legs, fused fingers, too many fingers, long neck, username, watermark, signature,(((deformed))), ^[blurry^], (poorly drawn hands)\"\",\"\"model\"\":\"\"" + modelString + "\"\",\"\"sampling_steps\"\":20,\"\"sampling_method\"\":\"\"k_euler_ancestral\"\",\"\"cfg_scale\"\":10,\"\"height\"\":768,\"\"width\"\":512,\"\"seed\"\":-1,\"\"priority\"\":\"\"low\"\"}\"";
+
+            try {
+                Process process = Runtime.getRuntime().exec(command);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    System.out.println(line);
+                }
+            } catch (IOException ignored) {
+                //Cry about it
+            }
+
+            interaction.setContent("Request sent");
+            interaction.update();
+        });
+
+    }
+
+    public static String generateUUID() {
+        //generate a random UUID in this format "https://api.yodayo.com/v1/text_to_images/5fee5d73-2986-41c8-9f54-e19ef6891c50"
+        StringBuilder uuid = new StringBuilder().append("\"https://api.yodayo.com/v1/text_to_images/");
+        UUID temp = UUID.randomUUID();
+        uuid.append(temp);
+        uuid.append("\"");
+        System.out.println(uuid.toString());
+        return uuid.toString();
     }
 
     private static void gnMethod(SlashCommandInteraction slashCommandInteraction) {
