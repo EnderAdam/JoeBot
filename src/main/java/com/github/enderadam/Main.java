@@ -363,7 +363,9 @@ public class Main {
 
         SlashCommand yodayoCommand = SlashCommand.with("yodayo", "Query Yodayo with a provided query and model (both options required)",
                 Arrays.asList(SlashCommandOption.createWithOptions(SlashCommandOptionType.STRING, "query", "query to search"),
-                        SlashCommandOption.createWithOptions(SlashCommandOptionType.DECIMAL, "model", "model to use (1-10)")))
+                        SlashCommandOption.createWithOptions(SlashCommandOptionType.DECIMAL, "model", "model to use (1-10)"),
+                        SlashCommandOption.createWithOptions(SlashCommandOptionType.STRING, "xcsrf", "xcsrf from yodayo"),
+                        SlashCommandOption.createWithOptions(SlashCommandOptionType.STRING, "cookie", "cookie from yodayo")))
                 .createGlobal(api)
                 .join();
         allCommands.add(yodayoCommand);
@@ -555,7 +557,7 @@ public class Main {
 
     private static void yodayoCommand(SlashCommandInteraction slashCommandInteraction) {
         // Couldn't figure out how to make options required for javacord so this is a workaround
-        if (slashCommandInteraction.getArguments().size() != 2 || slashCommandInteraction.getArguments().get(1).getDecimalValue().isEmpty()) {
+        if (slashCommandInteraction.getArguments().size() != 4 || slashCommandInteraction.getArguments().get(1).getDecimalValue().isEmpty()) {
             slashCommandInteraction.createImmediateResponder()
                     .setContent("Both arguments are required")
                     .setFlags(MessageFlag.EPHEMERAL)
@@ -566,9 +568,11 @@ public class Main {
         var prompt = slashCommandInteraction.getArguments().get(0).getStringValue().get();
         var model = slashCommandInteraction.getArguments().get(1).getDecimalValue().get();
         var modelString = yodayoModels.get((int) (model - 1));
+        var xcsrf = slashCommandInteraction.getArguments().get(2).getStringValue().get();
+        var cookie = slashCommandInteraction.getArguments().get(3).getStringValue().get();
 
         // Send the request to the site and respond to the user
-        slashCommandInteraction.respondLater().thenAccept(interaction -> requestYodayoImage(prompt, modelString, interaction, slashCommandInteraction.getChannel().get()));
+        slashCommandInteraction.respondLater().thenAccept(interaction -> requestYodayoImage(prompt, modelString, interaction, slashCommandInteraction.getChannel().get(), xcsrf, cookie));
     }
 
     private static String generateUUID() {
@@ -581,10 +585,10 @@ public class Main {
         return uuid.toString();
     }
 
-    private static void requestYodayoImage(String prompt, String modelString, InteractionOriginalResponseUpdater interaction, TextChannel channel) {
+    private static void requestYodayoImage(String prompt, String modelString, InteractionOriginalResponseUpdater interaction, TextChannel channel, String xcsrf, String cookie) {
         // Request the image from the site and wait for it to be generated before sending to the user
         String command =
-                "curl " + generateUUID() + " -X POST -H \"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0\" -H \"Accept: application/json, text/plain, */*\" -H \"Accept-Language: en-US,en;q=0.5\" -H \"X-CSRF-Token: jcXxOLoQQTnP4YzlU3M5TUMTp+AotRhZZgWVv0gfulnxft91OJgdYsem0v5hWHItFPU/bjMAYBiFYBMjBtambg==\" -H \"Content-Type: application/json\" -H \"Origin: https://yodayo.com\" -H \"Connection: keep-alive\" -H \"Referer: https://yodayo.com/\" -H \"Cookie: a; session_uuid=199dc3a9-7e23-41ed-a3f3-c7e410629933; _gorilla_csrf=MTY3NjI0NDM4NHxJbVpNYzNWVVdVdEpXRVp6U1ZJeE5HSk5hWFJNV1VabWJXMUpOR0owV0doQ05ESlhSMjVGTjBwSVJHTTlJZ289fAjjlj9rZPcOtWtRmkJkSqwFaP72ivzjtNEydiYlxzYp\" -H \"Sec-Fetch-Dest: empty\" -H \"Sec-Fetch-Mode: cors\" -H \"Sec-Fetch-Site: same-site\" -H \"TE: trailers\" --data-raw \"{\"\"prompt\"\":\"\"" + prompt + "\"\",\"\"negative_prompt\"\":\"\"(bad_prompt:0.8),  lowres, text, error, cropped, worst quality, low quality, jpeg artifacts, ugly, duplicate, morbid, mutilated, out of frame, extra fingers, mutated hands, poorly drawn hands, poorly drawn face, mutation, deformed, blurry, dehydrated, bad anatomy, bad proportions, extra limbs, cloned face, disfigured, gross proportions, malformed limbs, missing arms, missing legs, extra arms, extra legs, fused fingers, too many fingers, long neck, username, watermark, signature,(((deformed))), ^[blurry^], (poorly drawn hands)\"\",\"\"model\"\":\"\"" + modelString + "\"\",\"\"sampling_steps\"\":20,\"\"sampling_method\"\":\"\"k_euler_ancestral\"\",\"\"cfg_scale\"\":10,\"\"height\"\":768,\"\"width\"\":512,\"\"seed\"\":-1,\"\"priority\"\":\"\"low\"\"}\"";
+                "curl " + generateUUID() + " -X POST -H \"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0\" -H \"Accept: application/json, text/plain, */*\" -H \"Accept-Language: en-US,en;q=0.5\" -H \"X-CSRF-Token:" + xcsrf + "\" -H \"Content-Type: application/json\" -H \"Origin: https://yodayo.com\" -H \"Connection: keep-alive\" -H \"Referer: https://yodayo.com/\" -H \"Cookie:" + cookie + "\" -H \"Sec-Fetch-Dest: empty\" -H \"Sec-Fetch-Mode: cors\" -H \"Sec-Fetch-Site: same-site\" -H \"TE: trailers\" --data-raw \"{\"\"prompt\"\":\"\"" + prompt + "\"\",\"\"negative_prompt\"\":\"\"(bad_prompt:0.8),  lowres, text, error, cropped, worst quality, low quality, jpeg artifacts, ugly, duplicate, morbid, mutilated, out of frame, extra fingers, mutated hands, poorly drawn hands, poorly drawn face, mutation, deformed, blurry, dehydrated, bad anatomy, bad proportions, extra limbs, cloned face, disfigured, gross proportions, malformed limbs, missing arms, missing legs, extra arms, extra legs, fused fingers, too many fingers, long neck, username, watermark, signature,(((deformed))), ^[blurry^], (poorly drawn hands)\"\",\"\"model\"\":\"\"" + modelString + "\"\",\"\"sampling_steps\"\":100,\"\"sampling_method\"\":\"\"k_euler_ancestral\"\",\"\"cfg_scale\"\":10,\"\"height\"\":768,\"\"width\"\":512,\"\"seed\"\":-1,\"\"priority\"\":\"\"low\"\"}\"";
 
         String uuid = "";
         try {
@@ -596,33 +600,43 @@ public class Main {
             return;
         }
 
-        interaction.setContent("Request sent");
         interaction.setFlags(MessageFlag.EPHEMERAL);
+        interaction.setContent("Request sent");
         interaction.update();
 
         // Create a new completeableFuture to wait 25 minutes then download and send the image to the channel
         String finalUuid = uuid;
-        CompletableFuture.runAsync(() -> getYodayoImage(finalUuid, interaction, channel));
+        CompletableFuture.runAsync(() -> getYodayoImage(finalUuid, interaction, channel, cookie));
     }
 
-    private static void getYodayoImage(String finalUuid, InteractionOriginalResponseUpdater interaction, TextChannel channel) {
-        // Wait for 25 minutes before trying due to the API being slow
+    private static void getYodayoImage(String finalUuid, InteractionOriginalResponseUpdater interaction, TextChannel channel, String cookie) {
+        // Wait for 5 minutes before trying due to the API being slow
         try {
-            Thread.sleep(0);
+            Thread.sleep(300000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
         // Attempt to download the image from the server and then send it to the channel
         try {
-            String getCommand = "curl \"https://api.yodayo.com/v1/text_to_images?offset=0&limit=27\" -H \"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0\" -H \"Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8\" -H \"Accept-Language: en-US,en;q=0.5\" -H \"Connection: keep-alive\" -H \"Cookie: _gorilla_csrf=MTY3NjI0OTEzNnxJa0o0Vm5OWmIzTkhlV3RpVlRCNlNtbHBjMHg1VGtkbmJVRTVSMWhoVlVKTE1sZ3liVnBuYm1JNE1FRTlJZ289fGzp1RN7qxeKAs31FdX9q6oSIvhM4iviicVD8oyfA8DA; a; session_uuid=d739811b-6738-421b-bc13-e1874f2a2b10\" -H \"Upgrade-Insecure-Requests: 1\" -H \"Sec-Fetch-Dest: document\" -H \"Sec-Fetch-Mode: navigate\" -H \"Sec-Fetch-Site: none\" -H \"Sec-Fetch-User: ?1\"";
+            String getCommand = "curl \"https://api.yodayo.com/v1/text_to_images?offset=0&limit=25\" -H \"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0\" -H \"Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8\" -H \"Accept-Language: en-US,en;q=0.5\" -H \"Connection: keep-alive\" -H \"Cookie:" + cookie + "\" -H \"Upgrade-Insecure-Requests: 1\" -H \"Sec-Fetch-Dest: document\" -H \"Sec-Fetch-Mode: navigate\" -H \"Sec-Fetch-Site: none\" -H \"Sec-Fetch-User: ?1\"";
             Process p = Runtime.getRuntime().exec(getCommand);
             var json = gson.fromJson(new InputStreamReader(p.getInputStream()), JsonObject.class);
-            var data = json.get("text_to_images").getAsJsonArray();
-            for (JsonElement e : data) {
+            for (JsonElement e : json.get("text_to_images").getAsJsonArray()) {
                 var uuid2 = e.getAsJsonObject().get("uuid").getAsString();
                 if (uuid2.equals(finalUuid)) {
+                    if (e.getAsJsonObject().get("state").getAsString().equals("failed")) {
+                        interaction.setContent("Image Generation Failed, try again");
+                        interaction.update();
+                        return;
+                    }
+
                     var url = e.getAsJsonObject().get("output_image_url").getAsString();
+                    if (url.equals("")) {
+                        // Try again if it's not ready yet
+                        getYodayoImage(finalUuid, interaction, channel, cookie);
+                        return;
+                    }
                     var file = new File("SPOILER_" + uuid2 + ".png");
 
                     // Save to the file
@@ -648,7 +662,7 @@ public class Main {
                 }
             }
 
-        } catch (IOException e) {
+        } catch (IOException ignored) {
         }
     }
 
