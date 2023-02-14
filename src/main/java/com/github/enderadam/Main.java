@@ -55,7 +55,6 @@ public class Main {
     public static ArrayList<String> yodayoModels = new ArrayList<>(List.of("stable-diffusion-anime", "holo-waifu", "pastel", "abyss-diffusion", "niji", "sd-anime-classic", "kribo", "konosuba", "bocchi", "ojiberry"));
 
 
-
     public static void main(String[] args) {
         String token = System.getenv("TOKEN");
         String database_url = System.getenv("DATABASE_URL");
@@ -362,10 +361,10 @@ public class Main {
         allCommands.add(emoteCommand);
 
         SlashCommand yodayoCommand = SlashCommand.with("yodayo", "Query Yodayo with a provided query and model (both options required)",
-                Arrays.asList(SlashCommandOption.createWithOptions(SlashCommandOptionType.STRING, "query", "query to search"),
-                        SlashCommandOption.createWithOptions(SlashCommandOptionType.DECIMAL, "model", "model to use (1-10)"),
-                        SlashCommandOption.createWithOptions(SlashCommandOptionType.STRING, "xcsrf", "xcsrf from yodayo"),
-                        SlashCommandOption.createWithOptions(SlashCommandOptionType.STRING, "cookie", "cookie from yodayo")))
+                        Arrays.asList(SlashCommandOption.createWithOptions(SlashCommandOptionType.STRING, "query", "query to search"),
+                                SlashCommandOption.createWithOptions(SlashCommandOptionType.DECIMAL, "model", "model to use (1-10)"),
+                                SlashCommandOption.createWithOptions(SlashCommandOptionType.STRING, "xcsrf", "xcsrf from yodayo"),
+                                SlashCommandOption.createWithOptions(SlashCommandOptionType.STRING, "cookie", "cookie from yodayo")))
                 .createGlobal(api)
                 .join();
         allCommands.add(yodayoCommand);
@@ -572,7 +571,7 @@ public class Main {
         var cookie = slashCommandInteraction.getArguments().get(3).getStringValue().get();
 
         // Send the request to the site and respond to the user
-        slashCommandInteraction.respondLater().thenAccept(interaction -> requestYodayoImage(prompt, modelString, interaction, slashCommandInteraction.getChannel().get(), xcsrf, cookie));
+        slashCommandInteraction.respondLater().thenAccept(interaction -> requestYodayoImage(prompt, modelString, interaction, slashCommandInteraction.getChannel().get(), xcsrf, cookie, slashCommandInteraction.getUser()));
     }
 
     private static String generateUUID() {
@@ -585,7 +584,7 @@ public class Main {
         return uuid.toString();
     }
 
-    private static void requestYodayoImage(String prompt, String modelString, InteractionOriginalResponseUpdater interaction, TextChannel channel, String xcsrf, String cookie) {
+    private static void requestYodayoImage(String prompt, String modelString, InteractionOriginalResponseUpdater interaction, TextChannel channel, String xcsrf, String cookie, User user) {
         // Request the image from the site and wait for it to be generated before sending to the user
         String command =
                 "curl " + generateUUID() + " -X POST -H \"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0\" -H \"Accept: application/json, text/plain, */*\" -H \"Accept-Language: en-US,en;q=0.5\" -H \"X-CSRF-Token:" + xcsrf + "\" -H \"Content-Type: application/json\" -H \"Origin: https://yodayo.com\" -H \"Connection: keep-alive\" -H \"Referer: https://yodayo.com/\" -H \"Cookie:" + cookie + "\" -H \"Sec-Fetch-Dest: empty\" -H \"Sec-Fetch-Mode: cors\" -H \"Sec-Fetch-Site: same-site\" -H \"TE: trailers\" --data-raw \"{\"\"prompt\"\":\"\"" + prompt + "\"\",\"\"negative_prompt\"\":\"\"(bad_prompt:0.8),  lowres, text, error, cropped, worst quality, low quality, jpeg artifacts, ugly, duplicate, morbid, mutilated, out of frame, extra fingers, mutated hands, poorly drawn hands, poorly drawn face, mutation, deformed, blurry, dehydrated, bad anatomy, bad proportions, extra limbs, cloned face, disfigured, gross proportions, malformed limbs, missing arms, missing legs, extra arms, extra legs, fused fingers, too many fingers, long neck, username, watermark, signature,(((deformed))), ^[blurry^], (poorly drawn hands)\"\",\"\"model\"\":\"\"" + modelString + "\"\",\"\"sampling_steps\"\":100,\"\"sampling_method\"\":\"\"k_euler_ancestral\"\",\"\"cfg_scale\"\":10,\"\"height\"\":768,\"\"width\"\":512,\"\"seed\"\":-1,\"\"priority\"\":\"\"low\"\"}\"";
@@ -606,10 +605,10 @@ public class Main {
 
         // Create a new completeableFuture to wait 25 minutes then download and send the image to the channel
         String finalUuid = uuid;
-        CompletableFuture.runAsync(() -> getYodayoImage(finalUuid, interaction, channel, cookie));
+        CompletableFuture.runAsync(() -> getYodayoImage(finalUuid, interaction, channel, cookie, user, prompt));
     }
 
-    private static void getYodayoImage(String finalUuid, InteractionOriginalResponseUpdater interaction, TextChannel channel, String cookie) {
+    private static void getYodayoImage(String finalUuid, InteractionOriginalResponseUpdater interaction, TextChannel channel, String cookie, User user, String prompt) {
         // Wait for 5 minutes before trying due to the API being slow
         try {
             Thread.sleep(300000);
@@ -634,7 +633,7 @@ public class Main {
                     var url = e.getAsJsonObject().get("output_image_url").getAsString();
                     if (url.equals("")) {
                         // Try again if it's not ready yet
-                        getYodayoImage(finalUuid, interaction, channel, cookie);
+                        getYodayoImage(finalUuid, interaction, channel, cookie, user, prompt);
                         return;
                     }
                     var file = new File("SPOILER_" + uuid2 + ".png");
@@ -649,10 +648,12 @@ public class Main {
                     }
 
                     // Delete initial message
-                    interaction.delete();
-                    interaction.update();
+//                    interaction.delete();
+//                    interaction.update();
+                    String message = "Prompt: " + prompt + "\n" +
+                            "Requested by: " + user.getMentionTag() + "\n";
 
-                    channel.sendMessage(file).join();
+                    channel.sendMessage(message, file).join();
 
                     // Delete the file after finishing with it
                     fileOutputStream.close();
