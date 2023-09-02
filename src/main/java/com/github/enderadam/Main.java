@@ -1,13 +1,19 @@
 package com.github.enderadam;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.activity.ActivityAssets;
+import org.javacord.api.entity.channel.ServerVoiceChannel;
+import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.MessageAttachment;
+import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.invite.Invite;
@@ -17,10 +23,11 @@ import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.SlashCommandInteraction;
 import org.javacord.api.interaction.SlashCommandOption;
 import org.javacord.api.interaction.SlashCommandOptionType;
+import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
 
 import javax.swing.Timer;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -171,6 +178,30 @@ public class Main {
                         temp.addReaction(allEmoji.get("noleague"));
                     }
                 }
+                            api.getThreadPool().getScheduler().schedule(() -> {
+                                // delete the message
+                                message1.delete();
+                            }, 1, TimeUnit.HOURS);
+                            message1.addReaction(allEmoji.get("noleague"));
+                        });
+                    }
+                }
+            if (message.getContent().toLowerCase().contains("genshin")) {
+                // get channel id, send a "GENSHIT" message there and then delete it after 10 seconds
+                message.getChannel().sendMessage("genshit*").thenAccept(message1 -> {
+                    // wait 10 seconds with a timer
+                    api.getThreadPool().getScheduler().schedule(() -> {
+                        // delete the message
+                        message1.delete();
+                    }, 10, TimeUnit.SECONDS);
+                });
+            }
+
+            if (message.getAuthor().asUser().isPresent()) {
+                last30Messages.add(message.getAuthor().asUser().get().getMentionTag() + ": " + message.getContent() + message.getAttachments().stream().map(MessageAttachment::getUrl).toList());
+            }
+            if (last30Messages.size() > 30) {
+                last30Messages.remove(0);
             }
             if (!message.getContent().contains(":")) {
 //                HashSet<KnownCustomEmoji> allEmoji = new HashSet<>(api.getCustomEmojis());
@@ -202,13 +233,25 @@ public class Main {
 //                    kickPerson(api,message,event);
 //                }
 //            }
+            // if message pings the bot, including everyone, here and roles
+            if (message.getMentionedUsers().contains(api.getYourself()) ||
+                    message.mentionsEveryone()) {
+                event.getChannel().sendMessage("https://tenor.com/view/morbius-ping-morbius-morbiussweep-ping-jared-leto-gif-25020117")
+                        .thenAccept(message1 -> {
+                            api.getThreadPool().getScheduler().schedule(() -> {
+                                // delete the message
+                                message1.delete();
+                            }, 3, TimeUnit.SECONDS);
+                        });
+            }
             if (message.getContent().toLowerCase().contains("k-pop") || message.getContent().toLowerCase().contains("kpop")) {
                 message.addReaction(allEmoji.get("NoKPop"));
             }
-            if (Arrays.asList(message.getContent().toLowerCase().split(" ")).contains("ion")) {
+            // if message starts with ion
+            if (Arrays.stream(message.getContent().toLowerCase().split(" ")).anyMatch(x -> x.startsWith("ion"))) {
                 message.addReaction("⚛");
             }
-            if (Arrays.asList(message.getContent().toLowerCase().split(" ")).contains("forgor")) {
+            if (Arrays.stream(message.getContent().toLowerCase().split(" ")).anyMatch(x -> x.startsWith("forgor"))) {
                 message.addReaction("💀");
             }
             if (Arrays.asList(message.getContent().toLowerCase().split(" ")).contains("clearly")) {
@@ -264,29 +307,54 @@ public class Main {
             }
             if (message.getContent().toLowerCase().contains("joe")) {
                 double random = Math.random();
-                if (random < 0.01) {
-                    event.getChannel().sendMessage("https://tenor.com/view/axanar-alecpeters-axamonitor-monkey-ape-gif-18121300");
-                    message.getChannel().sendMessage("Responded to: " + message.getAuthor().getName());
-                } else if (random < 0.06) {
-                    event.getChannel().sendMessage("https://tenor.com/view/kanye-joe-stare-gif-19284974");
-                    message.getChannel().sendMessage("Responded to: " + message.getAuthor().getName());
-                } else if (random < 0.21) {
-                    event.getChannel().sendMessage("https://tenor.com/view/hey-joe-monkey-monkey-joe-monkey-heart-love-joe-gif-23020196");
-                    message.getChannel().sendMessage("Responded to: " + message.getAuthor().getName());
+                if (random < 0.05) {
+                    event.getChannel().sendMessage("https://tenor.com/view/axanar-alecpeters-axamonitor-monkey-ape-gif-18121300").thenAccept(message1 -> {
+                        api.getThreadPool().getScheduler().schedule(() -> {
+                            // delete the message
+                            message1.delete();
+                        }, 10, TimeUnit.SECONDS);
+                    });
+                } else if (random < 0.20) {
+                    event.getChannel().sendMessage("https://tenor.com/view/kanye-joe-stare-gif-19284974").thenAccept(message1 -> {
+                        api.getThreadPool().getScheduler().schedule(() -> {
+                            // delete the message
+                            message1.delete();
+                        }, 10, TimeUnit.SECONDS);
+                    });
+                } else if (random < 0.51) {
+                    event.getChannel().sendMessage("https://tenor.com/view/hey-joe-monkey-monkey-joe-monkey-heart-love-joe-gif-23020196").thenAccept(message1 -> {
+                        api.getThreadPool().getScheduler().schedule(() -> {
+                            // delete the message
+                            message1.delete();
+                        }, 10, TimeUnit.SECONDS);
+                    });
                 }
             }
             if (message.getContent().toLowerCase().contains("ratio")) {
-                double random = Math.random();
-                if (random < 0.2) {
-                    event.getChannel().sendMessage("https://tenor.com/view/yakuza-ratio-denied-gif-22244085");
-                    message.getChannel().sendMessage("Responded to: " + message.getAuthor().getName());
+                //if not itself
+                if (!message.getAuthor().asUser().get().getIdAsString().equals("898438764907606066")) {
+                    double random = Math.random();
+                    // send gif than delete it
+                    if (random < 0.75) {
+                        event.getChannel().sendMessage("https://tenor.com/view/yakuza-ratio-denied-gif-22244085").thenAccept(message1 -> {
+                            api.getThreadPool().getScheduler().schedule(() -> {
+                                // delete the message
+                                message1.delete();
+                            }, 10, TimeUnit.SECONDS);
+                        });
+                    }
                 }
             }
             if (message.getContent().toLowerCase().contains("ratio denied") || message.getContent().toLowerCase().contains("ratio-denied")) {
                 double random = Math.random();
                 if (random < 0.05) {
-                    event.getChannel().sendMessage("https://tenor.com/view/ratio-denied-ratio-denied-denied-you-fell-off-bozo-gif-24795104");
-                    message.getChannel().sendMessage("Responded to: " + message.getAuthor().getName());
+                    event.getChannel().sendMessage("https://tenor.com/view/ratio-denied-ratio-denied-denied-you-fell-off-bozo-gif-24795104").thenAccept(
+                            message1 -> {
+                                api.getThreadPool().getScheduler().schedule(() -> {
+                                    // delete the message
+                                    message1.delete();
+                                }, 10, TimeUnit.SECONDS);
+                            });
                 }
             }
             if (message.getContent().contains("🐒") || message.getContent().contains("🐵")) {
@@ -294,12 +362,12 @@ public class Main {
             }
 
 
-            message.addReactionAddListener(eventReaction -> {
-                if (eventReaction.getEmoji().equalsEmoji("🍕")) { //pizza
+//            message.addReactionAddListener(eventReaction -> {
+//                if (eventReaction.getEmoji().equalsEmoji("🍕")) { //pizza
 //                    eventReaction.deleteMessage();
-                }
+//                }
 //                System.out.println(eventReaction.getEmoji().getMentionTag());
-
+//
 //                if (eventReaction.getEmoji().equalsEmoji(allEmoji.get("isleep")) || eventReaction.getEmoji().equalsEmoji(allEmoji.get("isleep2"))) {
 //                    if (eventReaction.getUserIdAsString().equalsIgnoreCase("202206936601460736")) {
 //                        eventReaction.removeReaction();
@@ -307,7 +375,7 @@ public class Main {
 //                    }
 //                }
 //                if (eventReaction.getEmoji().equalsEmoji("🐒")) {
-////                    eventReaction.getUser().get().sendMessage("SPAM");
+//                    eventReaction.getUser().get().sendMessage("SPAM");
 //                    if (isKicking) {
 //                        if (!eventReaction.getUserIdAsString().equalsIgnoreCase("246637425961467904")) {
 //                            message.getServer().get().kickUser(api.getUserById(eventReaction.getUserIdAsString()).join());
@@ -315,7 +383,7 @@ public class Main {
 //                    }
 //
 //                }
-            }).removeAfter(30, TimeUnit.MINUTES);
+//            }).removeAfter(30, TimeUnit.MINUTES);
         });
 
 
@@ -352,6 +420,15 @@ public class Main {
                 .createGlobal(api)
                 .join();
         allCommands.add(emoteCommand);
+
+        SlashCommand yodayoCommand = SlashCommand.with("yodayo", "Query Yodayo with a provided query and model (both options required)",
+                        Arrays.asList(SlashCommandOption.createWithOptions(SlashCommandOptionType.STRING, "query", "query to search"),
+                                SlashCommandOption.createWithOptions(SlashCommandOptionType.DECIMAL, "model", "model to use (1-10)"),
+                                SlashCommandOption.createWithOptions(SlashCommandOptionType.STRING, "xcsrf", "xcsrf from yodayo"),
+                                SlashCommandOption.createWithOptions(SlashCommandOptionType.STRING, "cookie", "cookie from yodayo")))
+                .createGlobal(api)
+                .join();
+        allCommands.add(yodayoCommand);
 
         api.addSlashCommandCreateListener(event -> {
             SlashCommandInteraction slashCommandInteraction = event.getSlashCommandInteraction();
