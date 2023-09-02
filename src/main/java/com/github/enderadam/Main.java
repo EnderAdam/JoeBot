@@ -205,9 +205,6 @@ public class Main {
             if (message.getContent().toLowerCase().contains("k-pop") || message.getContent().toLowerCase().contains("kpop")) {
                 message.addReaction(allEmoji.get("NoKPop"));
             }
-            if (message.getContent().toLowerCase().contains("nigga-chan") || message.getContent().toLowerCase().contains("niggachan")) {
-                message.addReaction("🥰");
-            }
             if (Arrays.asList(message.getContent().toLowerCase().split(" ")).contains("ion")) {
                 message.addReaction("⚛");
             }
@@ -452,13 +449,13 @@ public class Main {
 
         List<String> allImages = new ArrayList<>();
         try {
-            allImages = FileUtils.getAllImages(new File("D:\\Torrent Files\\WeebSpoiler"), false);
+            allImages = FileUtils.getAllImages(new File(""), false);
         } catch (IOException e) {
             e.printStackTrace();
         }
         List<String> ganbareImages = new ArrayList<>();
         try {
-            ganbareImages = FileUtils.getAllImages(new File("D:\\Torrent Files\\Ganbare Douki-Chan"), false);
+            ganbareImages = FileUtils.getAllImages(new File(""), false);
         } catch (IOException e) {
             e.printStackTrace();
         }
