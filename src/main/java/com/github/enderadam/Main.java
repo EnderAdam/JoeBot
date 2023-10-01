@@ -1,13 +1,19 @@
 package com.github.enderadam;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.activity.ActivityAssets;
+import org.javacord.api.entity.channel.ServerVoiceChannel;
+import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.MessageAttachment;
+import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.invite.Invite;
@@ -17,10 +23,11 @@ import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.SlashCommandInteraction;
 import org.javacord.api.interaction.SlashCommandOption;
 import org.javacord.api.interaction.SlashCommandOptionType;
+import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
 
 import javax.swing.Timer;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -41,14 +48,17 @@ public class Main {
     private static final List<Server> servers = new ArrayList<>();
     private static final HashMap<String, KnownCustomEmoji> allEmoji = new HashMap<>();
     private static final Gson gson = new Gson();
+    private static List<String> last30Messages = new ArrayList<>();
 
     private static List<String> quotes;
 
     private static final String[] gnMessages = {"Goodnight girl, I see you tomorrow",
-            "Goodnight Gays, Sleep Tight ||like my bussy||",
-            "gn ||dn||",
+            "Goodnight Everyone",
+            "gn dn",
 
     };
+
+    public static ArrayList<String> yodayoModels = new ArrayList<>(List.of("stable-diffusion-anime", "holo-waifu", "pastel", "abyss-diffusion", "niji", "sd-anime-classic", "kribo", "konosuba", "bocchi", "ojiberry"));
 
 
     public static void main(String[] args) {
@@ -67,7 +77,11 @@ public class Main {
 //        }
 
         try {
-            quotes = Files.readAllLines(Paths.get("src/main/resources/quotes.txt"), StandardCharsets.UTF_8);
+            if (System.getProperty("os.name").toLowerCase().contains("window")) {
+                quotes = Files.readAllLines(Paths.get("src/main/resources/quotes.txt"), StandardCharsets.UTF_8);
+            } else {
+                quotes = Files.readAllLines(Paths.get("./quotes.txt"), StandardCharsets.UTF_8);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -123,12 +137,11 @@ public class Main {
                 }
             }
             if (message.getContent().toLowerCase(Locale.ROOT).contains("eclipse")) {
-                if (Math.random() < 0.25) {
-                    message.addReaction("\uD83C\uDDF8");
-                    message.addReaction("\uD83C\uDDED");
-                    message.addReaction("\uD83C\uDDEE");
-                    message.addReaction("\uD83C\uDDF9");
-                }
+                message.addReaction("\uD83C\uDDF8");
+                message.addReaction("\uD83C\uDDED");
+                message.addReaction("\uD83C\uDDEE");
+                message.addReaction("\uD83C\uDDF9");
+
             }
             if (league) {
                 if ((message.getContent().toLowerCase(Locale.ROOT).contains("league") || (message.getContent().toLowerCase(Locale.ROOT).contains("tft")))
@@ -146,11 +159,41 @@ public class Main {
                             }
                         }
                     }
+                    List<User> tempLeaguers = new ArrayList<>();
+
+
+                    //check if there are other players in the same vc as those who are playing league
+                    if (!leaguers.isEmpty()) {
+                        for (User u : leaguers) {
+                            if (!u.getConnectedVoiceChannels().stream().toList().isEmpty()) { //if voice channel is not empty
+                                System.out.println(u.getConnectedVoiceChannels().stream().toList().get(0).getName());
+                                for (ServerVoiceChannel vc : u.getConnectedVoiceChannels()) {
+                                    System.out.println(vc.getName());
+                                    for (User user : vc.getConnectedUsers()) {
+                                        System.out.println(user.getName());
+                                        if (!leaguers.contains(user)) {
+                                            tempLeaguers.add(user);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    //remove duplicates from templeaguers
+                    tempLeaguers = tempLeaguers.stream().distinct().collect(Collectors.toList());
+                    leaguers.addAll(tempLeaguers);
+
+
                     if (!leaguers.isEmpty()) {
                         StringBuilder leaguersToPrint = new StringBuilder();
                         leaguersToPrint.append("These losers are currently playing League:\n");
                         for (User u : leaguers) {
-                            leaguersToPrint.append(u.getMentionTag()).append("\t");
+                            if (tempLeaguers.contains(u)) {
+                                leaguersToPrint.append(u.getMentionTag() + "(Potentially)").append("\t");
+                            } else {
+                                leaguersToPrint.append(u.getMentionTag()).append("\t");
+                            }
                             for (Activity a : u.getActivities()) {
                                 if (a.getName().toLowerCase(Locale.ROOT).contains("league")) {
                                     leaguersToPrint.append(getActivityInfo(a.getAssets())).append("\t");
@@ -167,11 +210,56 @@ public class Main {
                         if (leaguers.size() >= 3) {
                             leaguersToPrint.append("Combo!! We have ").append(leaguers.size()).append(" losers");
                         }
-                        Message temp = message.getChannel().sendMessage(leaguersToPrint.toString()).join();
-                        temp.addReaction(allEmoji.get("noleague"));
+                        message.getChannel().sendMessage(leaguersToPrint.toString()).thenAccept(message1 -> {
+                            // wait 10 seconds with a timer
+                            api.getThreadPool().getScheduler().schedule(() -> {
+                                // delete the message
+                                message1.delete();
+                            }, 1, TimeUnit.HOURS);
+                            message1.addReaction(allEmoji.get("noleague"));
+                        });
                     }
                 }
             }
+            if (message.getContent().toLowerCase().contains("genshin")) {
+                // get channel id, send a "GENSHIT" message there and then delete it after 10 seconds
+                message.getChannel().sendMessage("genshit*").thenAccept(message1 -> {
+                    // wait 10 seconds with a timer
+                    api.getThreadPool().getScheduler().schedule(() -> {
+                        // delete the message
+                        message1.delete();
+                    }, 10, TimeUnit.SECONDS);
+                });
+            }
+
+            if (message.getAuthor().asUser().isPresent()) {
+                last30Messages.add(message.getAuthor().asUser().get().getMentionTag() + ": " + message.getContent() + message.getAttachments().stream().map(MessageAttachment::getUrl).toList());
+            }
+            if (last30Messages.size() > 30) {
+                last30Messages.remove(0);
+            }
+
+
+//            if (message.getServer().get().getName().equals("ARA")) {
+//                message.addReaction("🤣");
+//                message.addReaction("😅");
+//                message.addReaction("😂");
+//            }
+
+
+            if ((message.getContent().toLowerCase().contains("google it") ||
+                    message.getContent().toLowerCase().contains("just google")) &&
+                    !message.getAuthor().asUser().get().getIdAsString().equalsIgnoreCase("898438764907606066")) {
+                // get channel id, send a "GENSHIT" message there and then delete it after 10 seconds
+                message.getChannel().sendMessage("Google it, simple. Delete this and fuck off. NOW.").thenAccept(message1 -> {
+                    // wait 10 seconds with a timer
+                    api.getThreadPool().getScheduler().schedule(() -> {
+                        // delete the message
+                        message1.delete();
+                    }, 10, TimeUnit.MINUTES);
+                });
+            }
+
             if (!message.getContent().contains(":")) {
 //                HashSet<KnownCustomEmoji> allEmoji = new HashSet<>(api.getCustomEmojis());
 //                for (KnownCustomEmoji em : allEmoji) {
@@ -202,16 +290,25 @@ public class Main {
 //                    kickPerson(api,message,event);
 //                }
 //            }
+            // if message pings the bot, including everyone, here and roles
+            if (message.getMentionedUsers().contains(api.getYourself()) ||
+                    message.mentionsEveryone()) {
+                event.getChannel().sendMessage("https://tenor.com/view/morbius-ping-morbius-morbiussweep-ping-jared-leto-gif-25020117")
+                        .thenAccept(message1 -> {
+                            api.getThreadPool().getScheduler().schedule(() -> {
+                                // delete the message
+                                message1.delete();
+                            }, 3, TimeUnit.SECONDS);
+                        });
+            }
             if (message.getContent().toLowerCase().contains("k-pop") || message.getContent().toLowerCase().contains("kpop")) {
                 message.addReaction(allEmoji.get("NoKPop"));
             }
-            if (message.getContent().toLowerCase().contains("nigga-chan") || message.getContent().toLowerCase().contains("niggachan")) {
-                message.addReaction("🥰");
-            }
-            if (Arrays.asList(message.getContent().toLowerCase().split(" ")).contains("ion")) {
+            // if message starts with ion
+            if (Arrays.stream(message.getContent().toLowerCase().split(" ")).anyMatch(x -> x.startsWith("ion"))) {
                 message.addReaction("⚛");
             }
-            if (Arrays.asList(message.getContent().toLowerCase().split(" ")).contains("forgor")) {
+            if (Arrays.stream(message.getContent().toLowerCase().split(" ")).anyMatch(x -> x.startsWith("forgor"))) {
                 message.addReaction("💀");
             }
             if (Arrays.asList(message.getContent().toLowerCase().split(" ")).contains("clearly")) {
@@ -267,29 +364,54 @@ public class Main {
             }
             if (message.getContent().toLowerCase().contains("joe")) {
                 double random = Math.random();
-                if (random < 0.01) {
-                    event.getChannel().sendMessage("https://tenor.com/view/axanar-alecpeters-axamonitor-monkey-ape-gif-18121300");
-                    message.getChannel().sendMessage("Responded to: " + message.getAuthor().getName());
-                } else if (random < 0.06) {
-                    event.getChannel().sendMessage("https://tenor.com/view/kanye-joe-stare-gif-19284974");
-                    message.getChannel().sendMessage("Responded to: " + message.getAuthor().getName());
-                } else if (random < 0.21) {
-                    event.getChannel().sendMessage("https://tenor.com/view/hey-joe-monkey-monkey-joe-monkey-heart-love-joe-gif-23020196");
-                    message.getChannel().sendMessage("Responded to: " + message.getAuthor().getName());
+                if (random < 0.05) {
+                    event.getChannel().sendMessage("https://tenor.com/view/axanar-alecpeters-axamonitor-monkey-ape-gif-18121300").thenAccept(message1 -> {
+                        api.getThreadPool().getScheduler().schedule(() -> {
+                            // delete the message
+                            message1.delete();
+                        }, 10, TimeUnit.SECONDS);
+                    });
+                } else if (random < 0.20) {
+                    event.getChannel().sendMessage("https://tenor.com/view/kanye-joe-stare-gif-19284974").thenAccept(message1 -> {
+                        api.getThreadPool().getScheduler().schedule(() -> {
+                            // delete the message
+                            message1.delete();
+                        }, 10, TimeUnit.SECONDS);
+                    });
+                } else if (random < 0.51) {
+                    event.getChannel().sendMessage("https://tenor.com/view/hey-joe-monkey-monkey-joe-monkey-heart-love-joe-gif-23020196").thenAccept(message1 -> {
+                        api.getThreadPool().getScheduler().schedule(() -> {
+                            // delete the message
+                            message1.delete();
+                        }, 10, TimeUnit.SECONDS);
+                    });
                 }
             }
             if (message.getContent().toLowerCase().contains("ratio")) {
-                double random = Math.random();
-                if (random < 0.2) {
-                    event.getChannel().sendMessage("https://tenor.com/view/yakuza-ratio-denied-gif-22244085");
-                    message.getChannel().sendMessage("Responded to: " + message.getAuthor().getName());
+                //if not itself
+                if (!message.getAuthor().asUser().get().getIdAsString().equals("898438764907606066")) {
+                    double random = Math.random();
+                    // send gif than delete it
+                    if (random < 0.75) {
+                        event.getChannel().sendMessage("https://tenor.com/view/yakuza-ratio-denied-gif-22244085").thenAccept(message1 -> {
+                            api.getThreadPool().getScheduler().schedule(() -> {
+                                // delete the message
+                                message1.delete();
+                            }, 10, TimeUnit.SECONDS);
+                        });
+                    }
                 }
             }
             if (message.getContent().toLowerCase().contains("ratio denied") || message.getContent().toLowerCase().contains("ratio-denied")) {
                 double random = Math.random();
                 if (random < 0.05) {
-                    event.getChannel().sendMessage("https://tenor.com/view/ratio-denied-ratio-denied-denied-you-fell-off-bozo-gif-24795104");
-                    message.getChannel().sendMessage("Responded to: " + message.getAuthor().getName());
+                    event.getChannel().sendMessage("https://tenor.com/view/ratio-denied-ratio-denied-denied-you-fell-off-bozo-gif-24795104").thenAccept(
+                            message1 -> {
+                                api.getThreadPool().getScheduler().schedule(() -> {
+                                    // delete the message
+                                    message1.delete();
+                                }, 10, TimeUnit.SECONDS);
+                            });
                 }
             }
             if (message.getContent().contains("🐒") || message.getContent().contains("🐵")) {
@@ -297,12 +419,12 @@ public class Main {
             }
 
 
-            message.addReactionAddListener(eventReaction -> {
-                if (eventReaction.getEmoji().equalsEmoji("🍕")) { //pizza
+//            message.addReactionAddListener(eventReaction -> {
+//                if (eventReaction.getEmoji().equalsEmoji("🍕")) { //pizza
 //                    eventReaction.deleteMessage();
-                }
+//                }
 //                System.out.println(eventReaction.getEmoji().getMentionTag());
-
+//
 //                if (eventReaction.getEmoji().equalsEmoji(allEmoji.get("isleep")) || eventReaction.getEmoji().equalsEmoji(allEmoji.get("isleep2"))) {
 //                    if (eventReaction.getUserIdAsString().equalsIgnoreCase("202206936601460736")) {
 //                        eventReaction.removeReaction();
@@ -310,7 +432,7 @@ public class Main {
 //                    }
 //                }
 //                if (eventReaction.getEmoji().equalsEmoji("🐒")) {
-////                    eventReaction.getUser().get().sendMessage("SPAM");
+//                    eventReaction.getUser().get().sendMessage("SPAM");
 //                    if (isKicking) {
 //                        if (!eventReaction.getUserIdAsString().equalsIgnoreCase("246637425961467904")) {
 //                            message.getServer().get().kickUser(api.getUserById(eventReaction.getUserIdAsString()).join());
@@ -318,7 +440,7 @@ public class Main {
 //                    }
 //
 //                }
-            }).removeAfter(30, TimeUnit.MINUTES);
+//            }).removeAfter(30, TimeUnit.MINUTES);
         });
 
 
@@ -356,6 +478,15 @@ public class Main {
                 .join();
         allCommands.add(emoteCommand);
 
+        SlashCommand yodayoCommand = SlashCommand.with("yodayo", "Query Yodayo with a provided query and model (both options required)",
+                        Arrays.asList(SlashCommandOption.createWithOptions(SlashCommandOptionType.STRING, "query", "query to search"),
+                                SlashCommandOption.createWithOptions(SlashCommandOptionType.DECIMAL, "model", "model to use (1-10)"),
+                                SlashCommandOption.createWithOptions(SlashCommandOptionType.STRING, "xcsrf", "xcsrf from yodayo"),
+                                SlashCommandOption.createWithOptions(SlashCommandOptionType.STRING, "cookie", "cookie from yodayo")))
+                .createGlobal(api)
+                .join();
+        allCommands.add(yodayoCommand);
+
         api.addSlashCommandCreateListener(event -> {
             SlashCommandInteraction slashCommandInteraction = event.getSlashCommandInteraction();
             if (slashCommandInteraction.getCommandName().equals("ping")) {
@@ -372,6 +503,8 @@ public class Main {
                 emoteCommand(slashCommandInteraction);
             } else if (slashCommandInteraction.getCommandName().equals("allquotes")) {
                 allQuotesCommand(slashCommandInteraction);
+            } else if (slashCommandInteraction.getCommandName().equals("yodayo")) {
+                yodayoCommand(slashCommandInteraction);
             }
 
         });
@@ -413,6 +546,34 @@ public class Main {
             }
             changeNick(api.getUserById(parts[1]).join(), api, toChange, concatNick.toString());
         }
+        if (message.getContent().contains("!messages") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
+            String toSend = String.join("\n", last30Messages);
+            message.getAuthor().asUser().get().sendMessage("Messages option is: \n" + toSend);
+        }
+        if (message.getContent().contains("!getMessages") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
+            String messageRead = message.getContent();
+            String[] contents = messageRead.split(" ");
+            String channelID = contents[1];
+
+            //find the channel with the given id
+            //export all the messages as html file
+            //send the file to the user
+            TextChannel channel = api.getTextChannelById(channelID).orElse(null);
+            if (channel != null) {
+                channel.getMessagesAsStream().forEach(message1 -> {
+                    try {
+                        FileWriter myWriter = new FileWriter("messages.txt", true);
+                        //add author name, message content, message time and attachments
+                        myWriter.write(message1.getAuthor().getName() + " " + message1.getContent() + " " + message1.getCreationTimestamp() + " " + message1.getAttachments() + "\n");
+                        myWriter.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+
+
+        }
         if (message.getContent().contains("!servers") && message.getAuthor().asUser().get().getIdAsString().equals("246637425961467904")) {
 //                message.getAuthor().asUser().get().sendMessage(ARA.getInvites().join().toString());
             StringBuilder sb = new StringBuilder();
@@ -452,13 +613,13 @@ public class Main {
 
         List<String> allImages = new ArrayList<>();
         try {
-            allImages = FileUtils.getAllImages(new File("D:\\Torrent Files\\WeebSpoiler"), false);
+            allImages = FileUtils.getAllImages(new File(""), false);
         } catch (IOException e) {
             e.printStackTrace();
         }
         List<String> ganbareImages = new ArrayList<>();
         try {
-            ganbareImages = FileUtils.getAllImages(new File("D:\\Torrent Files\\Ganbare Douki-Chan"), false);
+            ganbareImages = FileUtils.getAllImages(new File(""), false);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -537,6 +698,200 @@ public class Main {
         slashCommandInteraction.createImmediateResponder()
                 .setContent(temp.toString())
                 .respond();
+    }
+
+    private static void yodayoCommand(SlashCommandInteraction slashCommandInteraction) {
+        // Couldn't figure out how to make options required for javacord so this is a workaround
+        if (slashCommandInteraction.getArguments().size() != 4 || slashCommandInteraction.getArguments().get(1).getDecimalValue().isEmpty()) {
+            slashCommandInteraction.createImmediateResponder()
+                    .setContent("Both arguments are required")
+                    .setFlags(MessageFlag.EPHEMERAL)
+                    .respond();
+            return;
+        }
+
+        var prompt = slashCommandInteraction.getArguments().get(0).getStringValue().get();
+        var model = slashCommandInteraction.getArguments().get(1).getDecimalValue().get();
+        var modelString = yodayoModels.get((int) (model - 1));
+        var xcsrf = slashCommandInteraction.getArguments().get(2).getStringValue().get();
+        var cookie = slashCommandInteraction.getArguments().get(3).getStringValue().get();
+
+        // Send the request to the site and respond to the user
+        slashCommandInteraction.respondLater().thenAccept(interaction -> {
+            try {
+                requestYodayoImage(prompt, modelString, interaction, slashCommandInteraction.getChannel().get(), xcsrf, cookie, slashCommandInteraction.getUser());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    private static String generateUUID() {
+        //generate a random UUID in this format "https://api.yodayo.com/v1/text_to_images/5fee5d73-2986-41c8-9f54-e19ef6891c50"
+        StringBuilder uuid = new StringBuilder().append("https://api.yodayo.com/v1/text_to_images/");
+        UUID temp = UUID.randomUUID();
+        uuid.append(temp);
+        System.out.println(uuid.toString());
+        return uuid.toString();
+    }
+
+    private static void requestYodayoImage(String prompt, String modelString, InteractionOriginalResponseUpdater interaction, TextChannel channel, String xcsrf, String cookie, User user) throws IOException {
+        // Request the image from the site and wait for it to be generated before sending to the user
+
+
+//        URL myURL = new URL(generateUUID());
+//        HttpURLConnection myURLConnection = (HttpURLConnection) myURL.openConnection();
+//        myURLConnection.setRequestMethod("POST");
+//        myURLConnection.setRequestProperty("header", "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0");
+//        myURLConnection.setRequestProperty("header", "Accept: application/json, text/plain, */*");
+//        myURLConnection.setRequestProperty("header", "Accept-Language: en-US,en;q=0.5");
+//        myURLConnection.setRequestProperty("header", "X-CSRF-Token:" + xcsrf);
+//        myURLConnection.setRequestProperty("header", "Content-Type: application/json");
+//        myURLConnection.setRequestProperty("header", "Origin: https://yodayo.com");
+//        myURLConnection.setRequestProperty("header", "Connection: keep-alive");
+//        myURLConnection.setRequestProperty("header", "Referer: https://yodayo.com/");
+//        myURLConnection.setRequestProperty("header", "Cookie:" + cookie);
+//        myURLConnection.setRequestProperty("header", "Sec-Fetch-Dest: empty");
+//        myURLConnection.setRequestProperty("header", "Sec-Fetch-Mode: cors");
+//        myURLConnection.setRequestProperty("header", "Sec-Fetch-Site: same-origin");
+//        myURLConnection.setRequestProperty("header", "Sec-GPC: 1");
+//        myURLConnection.setRequestProperty("header", "TE: Trailers");
+//        myURLConnection.setRequestProperty("header", "Pragma: no-cache");
+//        myURLConnection.setRequestProperty("header", "Cache-Control: no-cache");
+//        myURLConnection.setRequestProperty("header", "Accept-Encoding: gzip, deflate, br");
+//        myURLConnection.setRequestProperty("header", "Content-Length: 0");
+//        myURLConnection.setDoOutput(true);
+//        myURLConnection.setDoInput(true);
+//        myURLConnection.setRequestProperty("body", "{\"prompt\":\"" + prompt + "\",\"model\":\"" + modelString + "\"\",\"\"sampling_steps\"\":100,\"\"sampling_method\"\":\"\"k_euler_ancestral\"\",\"\"cfg_scale\"\":10,\"\"height\"\":768,\"\"width\"\":512,\"\"seed\"\":-1,\"\"priority\"\":\"\"low\"\"}");
+//        myURLConnection.connect(); // Or something like that
+//
+//        System.out.println(myURLConnection.getResponseMessage());
+//        System.out.println(myURLConnection.getResponseCode());
+//        System.out.println(myURLConnection.getContentType());
+//        System.out.println(myURLConnection.getContentLength());
+//        System.out.println(myURLConnection.getContentEncoding());
+//        System.out.println(myURLConnection.getContent());
+//        System.out.println(myURLConnection.getInputStream());
+//        var json = gson.fromJson(new InputStreamReader(myURLConnection.getInputStream()), JsonObject.class);
+//        System.out.println(json);
+//        String uuid = json.get("uuid").getAsString();
+
+//        await fetch("https://api.yodayo.com/v1/text_to_images/e6330713-3550-4c37-a93e-cd4aa54ce633", {
+//                "credentials": "include",
+//                "headers": {
+//            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/110.0",
+//                    "Accept": "application/json, text/plain, */*",
+//                    "Accept-Language": "en-US,en;q=0.5",
+//                    "X-CSRF-Token": "QjpzlN+Se9jUNdvKN1FeZypnvaTbrtPYEqRk751eAOB0ISyuJ1PfNheTS2910Gvpa/Q8r9YZg+x7k61I/8Gqiw==",
+//                    "Content-Type": "application/json",
+//                    "Sec-Fetch-Dest": "empty",
+//                    "Sec-Fetch-Mode": "cors",
+//                    "Sec-Fetch-Site": "same-site"
+//        },
+//        "referrer": "https://yodayo.com/",
+//                "body": "{\"prompt\":\"hakos baelz, cute, smiling, cute grown up, adult\",\"negative_prompt\":\"(bad_prompt:0.8),  lowres, text, error, cropped, worst quality, low quality, jpeg artifacts, ugly, duplicate, morbid, mutilated, out of frame, extra fingers, mutated hands, poorly drawn hands, poorly drawn face, mutation, deformed, blurry, dehydrated, bad anatomy, bad proportions, extra limbs, cloned face, disfigured, gross proportions, malformed limbs, missing arms, missing legs, extra arms, extra legs, fused fingers, too many fingers, long neck, username, watermark, signature,(((deformed))), [blurry], (poorly drawn hands)\",\"model\":\"holo-waifu\",\"sampling_steps\":100,\"sampling_method\":\"k_euler_ancestral\",\"cfg_scale\":10,\"height\":768,\"width\":512,\"seed\":2029546840,\"priority\":\"low\"}",
+//                "method": "POST",
+//                "mode": "cors"
+//});
+        String command;
+        if (System.getProperty("os.name").toLowerCase().contains("window")) {
+            command =
+                    "curl \"" + generateUUID() + "\" -X POST -H \"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0\" -H \"Accept: application/json, text/plain, */*\" -H \"Accept-Language: en-US,en;q=0.5\" -H \"X-CSRF-Token:" + xcsrf + "\" -H \"Content-Type: application/json\" -H \"Origin: https://yodayo.com\" -H \"Connection: keep-alive\" -H \"Referer: https://yodayo.com/\" -H \"Cookie:" + cookie + "\" -H \"Sec-Fetch-Dest: empty\" -H \"Sec-Fetch-Mode: cors\" -H \"Sec-Fetch-Site: same-site\" -H \"TE: trailers\" --data-raw \"{\"\"prompt\"\":\"\"" + prompt + "\"\",\"\"negative_prompt\"\":\"\"(bad_prompt:0.8),  lowres, text, error, cropped, worst quality, low quality, jpeg artifacts, ugly, duplicate, morbid, mutilated, out of frame, extra fingers, mutated hands, poorly drawn hands, poorly drawn face, mutation, deformed, blurry, dehydrated, bad anatomy, bad proportions, extra limbs, cloned face, disfigured, gross proportions, malformed limbs, missing arms, missing legs, extra arms, extra legs, fused fingers, too many fingers, long neck, username, watermark, signature,(((deformed))), ^[blurry^], (poorly drawn hands)\"\",\"\"model\"\":\"\"" + modelString + "\"\",\"\"sampling_steps\"\":100,\"\"sampling_method\"\":\"\"k_euler_ancestral\"\",\"\"cfg_scale\"\":10,\"\"height\"\":768,\"\"width\"\":512,\"\"seed\"\":-1,\"\"priority\"\":\"\"low\"\"}\"";
+        } else {
+            command =
+                    "curl " + generateUUID() + " -X POST -H User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0 -H Accept: application/json, text/plain, */* -H Accept-Language: en-US,en;q=0.5 -H X-CSRF-Token:" + xcsrf + " -H Content-Type: application/json -H Origin: https://yodayo.com -H Connection: keep-alive -H Referer: https://yodayo.com/ -H Cookie:" + cookie + " -H Sec-Fetch-Dest: empty -H Sec-Fetch-Mode: cors -H Sec-Fetch-Site: same-site -H TE: trailers --data-raw {\"prompt\":\"" + prompt + "\",\"negative_prompt\":\"(bad_prompt:0.8), lowres, text, error, cropped, worst quality, low quality, jpeg artifacts, ugly, duplicate, morbid, mutilated, out of frame, extra fingers, mutated hands, poorly drawn hands, poorly drawn face, mutation, deformed, blurry, dehydrated, bad anatomy, bad proportions, extra limbs, cloned face, disfigured, gross proportions, malformed limbs, missing arms, missing legs, extra arms, extra legs, fused fingers, too many fingers, long neck, username, watermark, signature,(((deformed))), ^[blurry^], (poorly drawn hands)\",\"model\":\"" + modelString + "\",\"sampling_steps\":100,\"sampling_method\":\"k_euler_ancestral\",\"cfg_scale\":10,\"height\":768,\"width\":512,\"seed\":-1,\"priority\":\"low\"}";
+        }
+
+        System.out.println(command);
+
+        String uuid = "";
+        try {
+            Process process = Runtime.getRuntime().exec(command);
+            //print out the output of the command
+            //convert inputstream of process to string
+
+
+            var json = gson.fromJson(new InputStreamReader(process.getInputStream()), JsonObject.class);
+            uuid = json.get("uuid").getAsString();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+
+
+        interaction.setFlags(MessageFlag.EPHEMERAL);
+        interaction.setContent("Request sent");
+        interaction.update();
+
+        // Create a new completeableFuture to wait 25 minutes then download and send the image to the channel
+        String finalUuid = uuid;
+        CompletableFuture.runAsync(() -> getYodayoImage(finalUuid, interaction, channel, cookie, user, prompt));
+    }
+
+    private static void getYodayoImage(String finalUuid, InteractionOriginalResponseUpdater interaction, TextChannel channel, String cookie, User user, String prompt) {
+        // Wait for 5 minutes before trying due to the API being slow
+        try {
+            Thread.sleep(300000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // Attempt to download the image from the server and then send it to the channel
+        try {
+            String getCommand;
+            if (System.getProperty("os.name").toLowerCase().contains("window")) {
+                getCommand = "curl \"https://api.yodayo.com/v1/text_to_images?offset=0&limit=25\" -H \"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0\" -H \"Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8\" -H \"Accept-Language: en-US,en;q=0.5\" -H \"Connection: keep-alive\" -H \"Cookie:" + cookie + "\" -H \"Upgrade-Insecure-Requests: 1\" -H \"Sec-Fetch-Dest: document\" -H \"Sec-Fetch-Mode: navigate\" -H \"Sec-Fetch-Site: none\" -H \"Sec-Fetch-User: ?1\"";
+            } else {
+                getCommand = "curl https://api.yodayo.com/v1/text_to_images?offset=0&limit=25 -H User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0 -H Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8 -H Accept-Language: en-US,en;q=0.5 -H Connection: keep-alive -H Cookie:" + cookie + " -H Upgrade-Insecure-Requests: 1 -H Sec-Fetch-Dest: document -H Sec-Fetch-Mode: navigate -H Sec-Fetch-Site: none -H Sec-Fetch-User: ?1";
+            }
+
+
+            Process p = Runtime.getRuntime().exec(getCommand);
+            var json = gson.fromJson(new InputStreamReader(p.getInputStream()), JsonObject.class);
+            for (JsonElement e : json.get("text_to_images").getAsJsonArray()) {
+                var uuid2 = e.getAsJsonObject().get("uuid").getAsString();
+                if (uuid2.equals(finalUuid)) {
+                    if (e.getAsJsonObject().get("state").getAsString().equals("failed")) {
+                        interaction.setContent("Image Generation Failed, try again");
+                        interaction.update();
+                        return;
+                    }
+
+                    var url = e.getAsJsonObject().get("output_image_url").getAsString();
+                    if (url.equals("")) {
+                        // Try again if it's not ready yet
+                        getYodayoImage(finalUuid, interaction, channel, cookie, user, prompt);
+                        return;
+                    }
+                    var file = new File("SPOILER_" + uuid2 + ".png");
+
+                    // Save to the file
+                    BufferedInputStream in = new BufferedInputStream(new URL(url).openStream());
+                    FileOutputStream fileOutputStream = new FileOutputStream(file);
+                    byte dataBuffer[] = new byte[1024];
+                    int bytesRead;
+                    while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                        fileOutputStream.write(dataBuffer, 0, bytesRead);
+                    }
+
+                    // Delete initial message
+//                    interaction.delete();
+//                    interaction.update();
+                    String message = "Prompt: " + prompt + "\n" +
+                            "Requested by: " + user.getMentionTag() + "\n";
+
+                    channel.sendMessage(message, file).join();
+
+                    // Delete the file after finishing with it
+                    fileOutputStream.close();
+                    in.close();
+                    file.delete();
+                    return;
+                }
+            }
+
+        } catch (IOException ignored) {
+        }
     }
 
     private static void gnMethod(SlashCommandInteraction slashCommandInteraction) {
