@@ -52,9 +52,7 @@ public class Main {
 
     private static List<String> quotes;
 
-    private static final String[] gnMessages = {"Goodnight girl, I see you tomorrow",
-            "Goodnight Everyone",
-            "gn dn",
+    private static final String[] gnMessages = {
 
     };
 
@@ -201,7 +199,13 @@ public class Main {
                                     // add how long they have been playing for in minutes:seconds
                                     if (a.getStartTime().isPresent()) {
                                         long time = a.getStartTime().get().until(Instant.now(), ChronoUnit.SECONDS);
-                                        leaguersToPrint.append(time / 60).append(":").append(time % 60).append("\t");
+                                        long minutes = time / 60;
+                                        long seconds = time % 60;
+                                        if (seconds < 10) {
+                                            leaguersToPrint.append(minutes).append(":0").append(seconds).append("\t");
+                                        } else {
+                                            leaguersToPrint.append(minutes).append(":").append(seconds).append("\t");
+                                        }
                                     }
                                 }
                             }
@@ -224,6 +228,16 @@ public class Main {
             if (message.getContent().toLowerCase().contains("genshin")) {
                 // get channel id, send a "GENSHIT" message there and then delete it after 10 seconds
                 message.getChannel().sendMessage("genshit*").thenAccept(message1 -> {
+                    // wait 10 seconds with a timer
+                    api.getThreadPool().getScheduler().schedule(() -> {
+                        // delete the message
+                        message1.delete();
+                    }, 10, TimeUnit.SECONDS);
+                });
+            }
+            if (message.getContent().toLowerCase().contains("joud")) {
+                // get channel id, send a "GENSHIT" message there and then delete it after 10 seconds
+                message.getChannel().sendMessage("roud*").thenAccept(message1 -> {
                     // wait 10 seconds with a timer
                     api.getThreadPool().getScheduler().schedule(() -> {
                         // delete the message
